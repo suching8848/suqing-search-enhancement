@@ -82,7 +82,11 @@ def main():
     assert mod.name == mid and version == metadata['version']
     assert not info.get('require', '').strip(), 'This main mod currently has no hard prerequisite; review unexpected change'
     item_id = resolve_workshop_item(PUB, mid, metadata)
-    assert metadata.get('visibility') == 'private'
+    visibility = metadata.get('visibility')
+    assert visibility in {'private', 'public'}, 'Review unsupported visibility before preparing publication'
+    # New items remain private drafts. Existing items can retain a public
+    # choice already recorded by native readback, without changing Steam here.
+    assert visibility == 'private' or item_id is not None, 'New-item preparation must remain private'
     baseline = args.baseline_stage.resolve()
     baseline_mod = baseline / 'Contents/mods' / mid
     assert baseline_mod.is_dir()
@@ -125,7 +129,7 @@ def main():
     shutil.copy2(PUB / 'preview.png', stage / 'preview.png')
     lines = ['version=1'] + native_item_id_lines(item_id) + ['title=' + title]
     lines += ['description=' + line for line in description.splitlines()]
-    lines += ['tags=' + ';'.join(metadata['tags']), 'visibility=private']
+    lines += ['tags=' + ';'.join(metadata['tags']), 'visibility=' + visibility]
     (stage / 'workshop.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     native_text = (stage / 'workshop.txt').read_text(encoding='utf-8')
     assert '\n'.join(x[len('description='):] for x in native_text.splitlines() if x.startswith('description=')) == description.rstrip('\n')
