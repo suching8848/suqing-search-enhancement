@@ -1,5 +1,7 @@
 # SuQing's Search Enhancement
 
+Current item identity, visibility and upload status: [workshop-item.json](publishing/workshop-item.json). Frozen manifests under release/ retain their preparation-time state; an old uploaded=false value there does not describe the current Steam item.
+
 Workshop item: [uploaded and verified private item](https://steamcommunity.com/sharedfiles/filedetails/?id=3834692575). Source repository: [suching8848/suqing-search-enhancement](https://github.com/suching8848/suqing-search-enhancement). Private upload and native content readback completed on2026-11-06. The item is not public; gameplay acceptance is unchanged.
 
 [简体中文](README.md)
