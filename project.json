@@ -2,7 +2,7 @@
   "title_cn": "蘇清的搜索增强",
   "title_en": "SuQing's Search Enhancement",
   "mod_id": "SuQingSearchEnhancement",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "source": ".",
   "required_mods": [],
   "native_api": "PZAPI/ModOptions",
@@ -11,18 +11,18 @@
     "yxjs_PinYinSearch 1.3",
     "ProximityInventory"
   ],
-  "frozen_candidate": "release/0.1.0_20261106_215302_publication-repair/SuQingSearchEnhancement-0.1.0-manual.zip",
-  "receipt": "release/0.1.0_20261106_215302_publication-repair/receipt.json",
+  "frozen_candidate": "release/0.1.2_20261107_063636/SuQingSearchEnhancement-0.1.2.zip",
+  "receipt": "release/0.1.2_20261107_063636/receipt.json",
   "validation": "validation/result.json",
-  "state": "User-confirmed runtime unchanged; private Workshop upload verified and source synchronized to GitHub. Gameplay scope unchanged.",
-  "workshop": "Uploaded and native-readback verified private; not public",
+  "state": "user-confirmed 0.1.2; 1147 offline assertions passed; Git/Workshop update in progress, Steam old-manifest CDN502 pending",
+  "workshop": "Existing public Workshop item 3834692575; 0.1.2 upload in progress, existing visibility preserved",
   "git": "Source published on main at https://github.com/suching8848/suqing-search-enhancement",
   "gameplay_acceptance": {
     "status": "user_confirmed",
-    "tested_version": "0.1.0-rc.3",
-    "reported_at": "2026-11-06",
-    "source": "user message: 搜索增强功能测试正常",
-    "scope": "Current local B42.21 single-player setup; user reports search functionality normal",
+    "tested_version": "0.1.2",
+    "reported_at": "2026-11-07T06:35:10.061568+08:00",
+    "source": "user message: 修复了可以更新git和创意工坊了",
+    "scope": "Current local B42.21 single-player setup; user confirms the search priority fix works",
     "not_claimed": [
       "complete English UI gameplay acceptance",
       "all third-party combinations",
@@ -32,21 +32,21 @@
       "measured performance gains"
     ],
     "runtime_lua_sha256": {
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "0d83de042cf5be03bd0a72959b706bddd03767f59d093ae0c4c037f59f7c587f",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "93df08c616d4a0ac5de8fb891ac1b83215d0d9f93eed17e333628ac5f60d2bb1",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "35df20cb78510ecdcad649764ce89862dfd5421609b0395ecfb5221dfec509eb",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "cca7c091c927876a69500684b0a509c6c125a6d1accceda5650d44d9b3c1c8ba",
       "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
-      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "0b3903734c1e223ae8d1e71b6e589077f70adf2088c1c416154f1ed530fc4d1c",
-      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae"
+      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "ba3a03d3471d328346cbefe8866f0987c7c0c6bbe55642b3286295be134b5cc3",
+      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "6963e4663fc70abafe52fad9c6e196eeca8bd55074437d7afa76a94e4de7e0b5",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "ac274770642ef8ad8a5cbb5e714104c992bbfebf0935c8aca299a4cdb3dced91",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "a5ce931a87acc823a8addca34ef43beed6736638e540096b04e45240231f60a4",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "26ae64769ca9ad3cd3cc38c7e88373d33c5d71d2c544c10b1290d634b6174b68"
     }
   },
   "publication_authorized": true,
-  "local_installed_version": "0.1.0-rc.3",
-  "workshop_staging": "release/0.1.0_20261106_215302_publication-repair/workshop-upload/SuQingSearchEnhancement",
-  "release_manifest": "release/0.1.0_20261106_215302_publication-repair/release-manifest.json",
-  "release_report": "publishing/待统一发布.md",
+  "local_installed_version": "0.1.2",
+  "workshop_staging": "release/0.1.2_20261107_063652_publication-repair/workshop-upload/SuQingSearchEnhancement",
+  "release_manifest": "release/0.1.2_20261107_063652_publication-repair/release-manifest.json",
+  "release_report": "publishing/发布记录_0.1.2.md",
   "cover_selection_pending": false,
   "cover_candidates": "art/cover-candidates_20261106/candidate-manifest.json",
   "selected_cover": {
@@ -67,6 +67,39 @@
   },
   "workshop_item_id": "3834692575",
   "workshop_identity": "publishing/workshop-item.json",
-  "public": false,
-  "uploaded_verified_private": true
+  "public": true,
+  "uploaded_verified_private": false,
+  "gameplay_acceptance_history": [
+    {
+      "status": "user_confirmed",
+      "tested_version": "0.1.0-rc.3",
+      "reported_at": "2026-11-06",
+      "source": "user message: 搜索增强功能测试正常",
+      "scope": "Current local B42.21 single-player setup; user reports search functionality normal",
+      "not_claimed": [
+        "complete English UI gameplay acceptance",
+        "all third-party combinations",
+        "controller gameplay acceptance",
+        "multiplayer or dedicated server",
+        "other game versions",
+        "measured performance gains"
+      ],
+      "runtime_lua_sha256": {
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "0d83de042cf5be03bd0a72959b706bddd03767f59d093ae0c4c037f59f7c587f",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "93df08c616d4a0ac5de8fb891ac1b83215d0d9f93eed17e333628ac5f60d2bb1",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "35df20cb78510ecdcad649764ce89862dfd5421609b0395ecfb5221dfec509eb",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "cca7c091c927876a69500684b0a509c6c125a6d1accceda5650d44d9b3c1c8ba",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
+        "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "0b3903734c1e223ae8d1e71b6e589077f70adf2088c1c416154f1ed530fc4d1c",
+        "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae"
+      }
+    }
+  ],
+  "candidate_publication": {
+    "version": "0.1.2",
+    "workshop_uploaded": false,
+    "git_committed": false,
+    "git_pushed": false
+  }
 }

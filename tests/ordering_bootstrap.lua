@@ -1,6 +1,6 @@
 -- Independent offline inventory/renderer model. No game, window or save is loaded.
 -- Load the real SuQing_ProximitySelectionFix.lua after this file to test its chain.
-OrderingMock = { options = { sortMatches = true }, buttons = {}, callbacks = {}, cleanVersion = "2.10.4" }
+OrderingMock = { options = { sortMatches = true }, buttons = {}, callbacks = {}, cleanVersion = "2.10.4", neatVersion = "1.0.2" }
 local M = OrderingMock
 function isServer() return false end
 function isMouseButtonDown(button) return M.buttons[button] == true end
@@ -12,6 +12,9 @@ ISMouseDrag = {}
 function getModInfoByID(id)
     if (id == "CleanUI" or id == "\\CleanUI") and M.cleanVersion then
         return { getModVersion = function() return M.cleanVersion end }
+    end
+    if (id == "NeatUI_Equipment" or id == "\\NeatUI_Equipment") and M.neatVersion then
+        return { getModVersion = function() return M.neatVersion end }
     end
     return nil
 end
@@ -183,6 +186,10 @@ local function renderNative(pane, doDragged, ...)
     pane.lastDragged = doDragged
     pane.lastRenderArguments = { ... }
     if doDragged then return "native-drag", 92 end
+    if pane.refreshWhileRendering then
+        pane.refreshWhileRendering = false
+        pane:refreshContainer()
+    end
     if pane.inventory:isDrawDirty() then pane:refreshContainer() end
     pane.items, pane.drawnSelected = {}, {}
     local function add(value)

@@ -209,6 +209,68 @@ ISInventoryPane.renderdetails(pane, true)
 equal(#pane.calls, 0, "dragging never draws search overlays")
 
 case()
+-- Native-colored highlighting is per displayed item, including expanded mixed
+-- stacks. Selection/hover keep their native backgrounds and their purple edge.
+results = query(page, "m110")
+pane.items = { { items = { rifle, concealed, floorItem } }, rifle, concealed, floorItem }
+local function coloredCalls(kind, alpha, red, green, blue)
+    local count = 0
+    for _, call in ipairs(pane.calls) do
+        local args = call.args
+        if call.kind == kind and args[5] == alpha and args[6] == red
+            and args[7] == green and args[8] == blue then count = count + 1 end
+    end
+    return count
+end
+local function yellow() return coloredCalls("rect-static", 0.3, 0.5, 0.3, 0.1) end
+local function purple() return coloredCalls("border-static", 0.65, 0.82, 0.65, 1) end
+pane.calls = {}
+SQ.drawMatches(pane, false)
+equal(yellow(), 3, "native yellow applied only to matching group and children")
+equal(purple(), 3, "purple borders accompany yellow on matching rows")
+pane.items[1].matchesSearch = true
+pane.calls = {}
+SQ.drawMatches(pane, false)
+equal(yellow(), 0, "native category yellow never receives a second fill")
+equal(purple(), 3, "native highlighted groups retain enhanced purple borders")
+pane.items[1].matchesSearch = false
+pane.selected, pane.mouseOverOption = { [1] = true }, 2
+pane.calls = {}
+SQ.drawMatches(pane, false)
+equal(yellow(), 1, "selected and hovered rows retain native background colors")
+equal(purple(), 3, "selected and hovered matches retain purple edges")
+pane.mouseOverOption, pane.selected = nil, { [2] = true }
+pane.dragging, pane.dragStarted, pane.calls = {}, true, {}
+SQ.drawMatches(pane, false)
+equal(yellow(), 2, "dragged selected item receives no background at its old position")
+equal(purple(), 2, "dragged selected item receives no purple ghost border")
+pane.dragging, pane.dragStarted, pane.selected, pane.calls = nil, false, {}, {}
+pane.vscroll = { getWidth = function() return 11 end }
+pane.isVScrollBarVisible = function() return true end
+SQ.drawMatches(pane, false)
+equal(pane.calls[1].args[3], pane.width - 13, "highlight leaves actual visible scrollbar width free")
+pane.isVScrollBarVisible = function() return false end
+pane.calls = {}
+SQ.drawMatches(pane, false)
+equal(pane.calls[1].args[3], pane.width - 2, "no fixed empty strip when scrollbar is hidden")
+pane.selected, pane.mouseOverOption, pane.yScroll = {}, nil, -25
+pane.calls = {}
+SQ.drawMatches(pane, false)
+equal(yellow(), 2, "scrolled-out group does not draw a background")
+for _, call in ipairs(pane.calls) do
+    if call.kind == "rect-static" or call.kind == "border-static" then
+        equal(call.args[2] >= pane.headerHgt, true, "search overlays never cover the header")
+    end
+end
+pane.yScroll, pane.calls = 0, {}
+results.ready = false
+SQ.drawMatches(pane, false)
+equal(#pane.calls, 0, "pending snapshot never paints stale matches")
+SQ.clearQuery(0, "nearby")
+SQ.drawMatches(pane, false)
+equal(#pane.calls, 0, "native-only ordinary queries receive no enhanced decoration")
+
+case()
 -- Event coalescing: multiple container signals do not delay an already due refresh.
 SQ.pages = setmetatable({ [page] = true }, { __mode = "k" })
 SQ.clearQuery(0, "nearby")
@@ -263,4 +325,18 @@ SQ.clearQuery(0, "nearby")
 equal(revisionState.ready, false, "clearing requests native-order restoration")
 equal(revisionState.revision, pendingRevision + 3, "clear invalidates ordering cache")
 equal((M.orderingCalls or 0) >= 2, true, "renderer dispatches both passes through ordering adapter")
+
+case()
+local replays = 0
+SQ.getSearchHandlingMode = function() return M.options.searchHandling or "all" end
+SQ.Integration = { refreshOptions = function() replays = replays + 1 end }
+SQ.tick()
+M.options.searchHandling = "special"
+SQ.tick()
+equal(replays, 1, "live sandbox mode change replays current field routing")
+SQ.tick()
+equal(replays, 1, "unchanged sandbox mode does not repeatedly replay fields")
+M.options.searchHandling = "all"
+SQ.tick()
+equal(replays, 2, "switching back to all replays fields immediately")
 return "SQSEARCH_RUNTIME cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

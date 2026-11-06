@@ -1,0 +1,7 @@
+{
+  "Sandbox_SuQingSearchEnhancement": "蘇清的搜索增强",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling": "原搜索框接管方式",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling_tooltip": "默认全部接管：普通名称、拼音和特殊语法均使用增强匹配、高亮与置顶。仅特殊语法：普通单词／中文名称沿用原搜索框的匹配和黄色高亮；输入 @来源、&完整ID、-排除、|或者、双引号短语或多个空格分隔的条件后才启用增强。两端空白不算特殊语法。独立增强面板不受此设置限制。",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling_option1": "全部接管（默认）",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling_option2": "仅特殊语法接管"
+}

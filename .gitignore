@@ -5,6 +5,7 @@ __pycache__/
 *.class
 
 validation/isolated-home/
+validation/sandbox-probe-home/
 
 release/
 
@@ -59,3 +60,11 @@ tests/**/*_bytecode.txt
 **/players.db
 **/map_p.bin
 **/map_sand.bin
+
+# Generated upstream fixtures and local investigation records stay local.
+validation/cleanui_release_fixture.lua
+validation/ordering_debug.lua
+validation/ordering_drag_release_counterexample.json
+validation/ordering_rawget_probe_classpath.json
+/拖拽后置顶修复记录.md
+/搜索接管与高亮更新记录.md

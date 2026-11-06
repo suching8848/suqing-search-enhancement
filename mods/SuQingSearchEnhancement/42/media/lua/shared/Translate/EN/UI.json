@@ -1,7 +1,7 @@
 {
   "UI_SQSearch_Title": "SuQing's Search Enhancement",
   "UI_SQSearch_Integrate": "Integrate with existing inventory search fields",
-  "UI_SQSearch_IntegrateTip": "On by default. Names, pinyin and combined queries use the same enhanced matcher in supported fields. Category mode follows the existing interface.",
+  "UI_SQSearch_IntegrateTip": "On by default. The sandbox handling mode selects all queries (default) or special syntax only. Category mode follows the existing interface.",
   "UI_SQSearch_ClickPopup": "Open enhanced search on left-click in a search field",
   "UI_SQSearch_ClickPopupTip": "Off by default. Requires search-field integration. Carries over the text and inventory or nearby scope.",
   "UI_SQSearch_OpenKey": "Open Search Enhancement",
@@ -19,7 +19,7 @@
   "UI_SQSearch_Exclude": "- Exclude",
   "UI_SQSearch_Or": "| Either",
   "UI_SQSearch_Placeholder": "Item name, @mod, &Full.ItemID...",
-  "UI_SQSearch_Help": "Names and source display names support partial matching regardless of ASCII case, whitespace, hyphens and underscores. With Pinyin Search enabled, NIUROUBING and NRB both match 牛肉饼; M110BQ matches M110 步枪. <LINE> Space-separated terms must all match the same item. <LINE> @\"Mod Name\" brewing -book searches that mod and excludes books. <LINE> &Chinesecuisine.BrewingBook34 matches the complete item ID exactly. <LINE> wrench | hammer matches either group. Spaces take precedence over |. <LINE> Use double quotes for phrases with spaces. @vanilla finds vanilla items. <LINE> Matching groups appear first by default. Purple outlines mark hits. 2/5 means two matching items in that stack. Nearby includes currently accessible, explored containers and visible floor items. <LINE> Options > Mod Options > SuQing's Search Enhancement contains integration, click-to-open and shortcut settings.",
+  "UI_SQSearch_Help": "Names and source display names support partial matching regardless of ASCII case, whitespace, hyphens and underscores. With Pinyin Search enabled, NIUROUBING and NRB both match 牛肉饼; M110BQ matches M110 步枪. <LINE> Space-separated terms must all match the same item. <LINE> @\"Mod Name\" brewing -book searches that mod and excludes books. <LINE> &Chinesecuisine.BrewingBook34 matches the complete item ID exactly. <LINE> wrench | hammer matches either group. Spaces take precedence over |. <LINE> Use double quotes for phrases with spaces. @vanilla finds vanilla items. <LINE> Matching groups appear first by default. Purple outlines and original yellow search highlights mark hits; selection/hover retain their backgrounds. 2/5 means two matching items in that stack. Nearby includes currently accessible, explored containers and visible floor items. <LINE> Options > Mod Options > SuQing's Search Enhancement contains integration, click-to-open and shortcut settings. <LINE> Sandbox Options > SuQing's Search Enhancement > Existing search-field handling defaults to all searches. Special-only mode leaves ordinary field input native; @, &, -, |, quotes and whitespace AND activate enhancement. The F8 panel always enhances searches.",
   "UI_SQSearch_Empty": "Enter a query to mark results in the existing item lists",
   "UI_SQSearch_Native": "Using the existing search field; edit here to refine the query",
   "UI_SQSearch_Count": "%1 matching items · marked in item lists and container tabs",
@@ -30,7 +30,7 @@
   "UI_SQSearch_Unknown": "Unknown source",
   "UI_SQSearch_Open": "SuQing's Search Enhancement...",
   "UI_SQSearch_SortMatches": "Move matching results to the top",
-  "UI_SQSearch_SortMatchesTip": "On by default. Matching item groups appear first, preserving order within both groups. Clearing restores native order. Reordering waits during dragging or marquee selection.",
+  "UI_SQSearch_SortMatchesTip": "On by default. Matching groups appear first in the actual display list, preserving order within both groups and following filter/sort changes. Clearing restores native order. Reordering waits during dragging or marquee selection.",
   "UI_SQSearch_ContextMenu": "Show the inventory context-menu entry",
   "UI_SQSearch_ContextMenuTip": "Off by default. Show the Search Enhancement entry in inventory context menus. F8 and integrated search fields work independently."
 }

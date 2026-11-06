@@ -12,6 +12,7 @@ local modNames = {}
 local pinyinEnabled = false
 local dueAt = 0
 local lastRefresh = 0
+local searchHandling
 
 local function now()
     return getTimestampMs()
@@ -165,16 +166,35 @@ function SQ.drawMatches(pane, doDragged)
     if doDragged or not pane.parent or not pane.items then return end
     local page = pane.parent
     local state = SQ.getState(pane.player, page.onCharacter and "inventory" or "nearby")
-    if not state.compiled.active then return end
+    if not state.compiled.active or not state.ready then return end
     local header, rowHeight = pane.headerHgt, pane.itemHgt
-    local width, height = pane:getWidth() - 18, pane:getHeight()
+    local scrollWidth = 0
+    if pane.vscroll and pane.isVScrollBarVisible and pane:isVScrollBarVisible() then
+        scrollWidth = pane.vscroll:getWidth()
+    end
+    local width, height = math.max(0, pane:getWidth() - 2 - scrollWidth), pane:getHeight()
     local showCounts = SQ.getOptions().showCounts
+    local nativeHighlight = false
     for index, row in ipairs(pane.items) do
+        -- CleanUI applies the group's native search flag to every expanded
+        -- child. Its row map holds the actual child item, not that flag.
+        if type(row) == "table" then
+            if row.type == "separator" then nativeHighlight = false
+            elseif row.items then nativeHighlight = row.matchesSearch == true end
+        end
         local y = (index - 1) * rowHeight + header + pane:getYScroll()
         if y + rowHeight > header and y < height then
             local count, total = SQ.rowCount(row, state)
-            if count > 0 then
+            local dragged = pane.dragging ~= nil and pane.dragStarted and pane.selected and pane.selected[index]
+            if count > 0 and not dragged then
                 local top, bottom = math.max(header, y), math.min(height, y + rowHeight)
+                -- Same RGBA as CleanUI's native yellow search background.
+                -- Preserve selection/hover colors and never stack two yellow
+                -- fills when a native category search already painted the row.
+                if not nativeHighlight and not (pane.selected and pane.selected[index])
+                    and pane.mouseOverOption ~= index then
+                    pane:drawRectStatic(1, top, width, bottom - top, 0.3, 0.5, 0.3, 0.1)
+                end
                 pane:drawRectStatic(1, top, 3, bottom - top, 0.9, 0.82, 0.65, 1)
                 pane:drawRectBorderStatic(1, top, width, bottom - top, 0.65, 0.82, 0.65, 1)
                 if showCounts and total > 1 and top == y and bottom == y + rowHeight then
@@ -227,6 +247,14 @@ local function installRenderer()
 end
 
 function SQ.tick()
+    local handling = SQ.getSearchHandlingMode and SQ.getSearchHandlingMode() or "all"
+    if handling ~= searchHandling then
+        local previous = searchHandling
+        searchHandling = handling
+        -- An in-game sandbox editor may change the policy without ModOptions'
+        -- apply callback. Replay text once so stale enhanced hits disappear.
+        if previous ~= nil and SQ.Integration then SQ.Integration.refreshOptions() end
+    end
     local timestamp = now()
     if dueAt == 0 and timestamp - lastRefresh < 1000 then return end
     if dueAt > timestamp then return end

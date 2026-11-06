@@ -206,4 +206,20 @@ equal(Core.matches(gun, { active = true, groups = { {} } }, options), false, "em
 equal(Core.matches(gun, { active = true, groups = {} }, options), false, "empty active query never matches")
 Core.clearMetadataCache()
 test("@MFS &Base.M110", gun, true, "cache reset preserves meaning")
+
+-- Special-only integration follows the same grammar as enhanced compilation,
+-- including AND whitespace and malformed syntax that needs an enhanced error.
+local unicodeName = "\231\137\155\232\130\137\233\165\188" -- UTF-8 牛肉饼, matching Java UI input.
+for _, query in ipairs({ "", " \t\r\n", "nails", unicodeName, " NRB ", "M-16", "A@B", "A&B", "C:\\Tools" }) do
+    cases = cases + 1
+    equal(Core.hasSpecialSyntax(query), false, "literal query remains native: " .. query)
+    equal(Core.compile(query).special, false, "literal parse flag: " .. query)
+end
+for _, query in ipairs({ "@MFS", "&Base.Nails", "-box", "-@MFS", "-&Base.Nails", "nails | box", "nails box", "nails\tbox", '"nails box"', '"A \\"B\\""', "@", "&", "-", "|", "nails|", '"unfinished', '""' }) do
+    cases = cases + 1
+    equal(Core.hasSpecialSyntax(query), true, "special query activates enhancement: " .. query)
+    equal(Core.compile(query).special, true, "special parse flag: " .. query)
+end
+cases = cases + 1
+equal(Core.hasSpecialSyntax(nil), false, "nil query remains native")
 return "SQSEARCH_CORE cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

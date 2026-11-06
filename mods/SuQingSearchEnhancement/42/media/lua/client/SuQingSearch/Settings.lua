@@ -1,4 +1,5 @@
 require "PZAPI/ModOptions"
+require "SuQingSearch/Core"
 
 SuQingSearch = SuQingSearch or {}
 local SQ = SuQingSearch
@@ -16,11 +17,29 @@ if not options then
 end
 SQ.settings = options
 
+-- Missing options in existing worlds use the declared sandbox default. Reading
+-- this on demand also picks up a world-setting change without modifying saves.
+function SQ.getSearchHandlingMode()
+    local variables = type(SandboxVars) == "table" and SandboxVars.SuQingSearchEnhancement or nil
+    if type(variables) == "table" and tonumber(variables.SearchHandling) == 2 then
+        return "special"
+    end
+    return "all"
+end
+
+-- Only existing search fields use this switch. The dedicated enhanced panel
+-- always supports the complete query language regardless of the sandbox mode.
+function SQ.shouldHandleQuery(query)
+    if not tostring(query or ""):find("%S") then return false end
+    return SQ.getSearchHandlingMode() == "all" or SQ.Core.hasSpecialSyntax(query)
+end
+
 function SQ.getOptions()
     local result = {}
     for _, key in ipairs({"integrate", "clickPopup", "openKey", "showCounts", "showHelp", "pinyin", "sortMatches", "showContextMenu"}) do
         result[key] = options:getOption(key):getValue()
     end
+    result.searchHandling = SQ.getSearchHandlingMode()
     return result
 end
 

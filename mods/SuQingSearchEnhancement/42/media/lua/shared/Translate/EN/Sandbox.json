@@ -1,0 +1,7 @@
+{
+  "Sandbox_SuQingSearchEnhancement": "SuQing's Search Enhancement",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling": "Existing search-field handling",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling_tooltip": "Handle all searches by default: names, pinyin and special syntax use enhanced matching, highlights and ordering. Special syntax only: single words and Chinese names keep the existing field's matcher and yellow highlighting. Enhancement starts for @source, &Full.ID, -exclusions, | alternatives, quoted phrases or multiple whitespace-separated AND terms. Surrounding whitespace does not trigger it. The dedicated enhanced panel always uses enhanced searching.",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling_option1": "Handle all searches (default)",
+  "Sandbox_SuQingSearchEnhancement_SearchHandling_option2": "Special syntax only"
+}

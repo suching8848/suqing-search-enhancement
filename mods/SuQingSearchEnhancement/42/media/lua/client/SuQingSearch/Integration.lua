@@ -22,9 +22,10 @@ local function options()
     return SQ.getOptions and SQ.getOptions() or { integrate = true, clickPopup = false }
 end
 
--- Ordinary words share pinyin, case and separator matching with expressions.
--- Parsing/validation still belongs to Core, including incomplete typed queries.
+-- The sandbox policy only controls existing search fields. The dedicated
+-- enhancement panel remains an explicit request to use the shared matcher.
 function M.isSearchQuery(value)
+    if SQ.shouldHandleQuery then return SQ.shouldHandleQuery(value) end
     return tostring(value or ""):find("%S") ~= nil
 end
 
@@ -81,10 +82,18 @@ function M.attach(handler, originalChange)
     bindField(handler, handler.searchField)
 end
 
+local function ownSlot(object, name)
+    -- PZO's table implementation can expose inherited entries through rawget.
+    -- Iteration still distinguishes a real instance override from its class.
+    for key, value in pairs(object) do
+        if key == name then return value end
+    end
+end
+
 local function withCategoryOnly(handler, original, category, ...)
     -- Shadow this instance only, preserving both inherited methods and unusual
     -- instance overrides. Always restore the exact previous slot on an error.
-    local previous = rawget(handler, "getSearchTexts")
+    local previous = ownSlot(handler, "getSearchTexts")
     handler.getSearchTexts = function() return "", category end
     local ok, result = pcall(original, handler, ...)
     handler.getSearchTexts = previous

@@ -1,0 +1,10 @@
+VERSION = 1,
+
+option SuQingSearchEnhancement.SearchHandling
+{
+    type = enum,
+    numValues = 2,
+    default = 1,
+    page = SuQingSearchEnhancement,
+    translation = SuQingSearchEnhancement_SearchHandling,
+}

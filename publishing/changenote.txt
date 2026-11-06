@@ -1,6 +1,3 @@
-0.1.0 · 2026-11-06
-中文：首个待统一发布版本。提供随身／附近增强搜索、默认 F8、可配置原框接入及左键弹出、来源／完整 ID／组合条件、可选全拼和首字母、大小写宽松匹配、计数及匹配组置顶。右键入口默认隐藏。交付中英文本、系列封面和独立透明 icon。用户已反馈当前 B42.21 单人功能正常；与已测 rc.3 的功能 Lua 完全一致。本地资料准备完成，尚未上传。
-English: First version prepared for batch publication. Includes carried/nearby search, configurable F8 and field integration/click popup, source/full-ID/compound conditions, optional full/initial pinyin, case-tolerant matching, counts and result priority. Context entry is hidden by default. Includes Chinese/English text, series cover and a separate transparent icon. The user reports normal functionality in their current B42.21 single-player setup; functional Lua is identical to the tested rc.3. Materials are local and have not been uploaded.
-
-发布资料修订：同步用户修改的中英开场文案，运行代码未变。
-Publication copy revision: synchronized the user-edited opening copy in both languages; runtime code unchanged.
+0.1.2 · 2026-11-07
+中文：修复拖拽结束后直接搜索仍不置顶，真正拖拽／鼠标按住／框选继续延后重排，结束后恢复。本次从 0.1.0 累积更新，包含 0.1.1 的沙盒搜索框接管方式、原搜索黄底与紫边，以及 NeatUI 过滤列表和绘制刷新后的置顶修复。保留选择、原排序恢复、现有 ID 和拼音规则。1147 条离线断言通过；用户已确认当前本机 B42.21 单人搜索置顶修复有效。完整英文、全部沙盒／第三方组合、手柄、多人及性能收益未作完整验收。
+English: Restores priority when searching immediately after drag release; active dragging, mouse holds and marquee selection still defer ordering until release. This cumulative update from 0.1.0 also includes the 0.1.1 sandbox search-handling mode, original yellow highlighting with purple outlines, and priority repairs for NeatUI filtered views and rendering refreshes. Retains selection, native-order restoration, IDs and pinyin rules. All 1147 offline assertions passed; the user confirmed the fix in their current local B42.21 single-player setup. Complete English UI, all sandbox/third-party combinations, controllers, multiplayer and performance gains have not been exhaustively accepted.

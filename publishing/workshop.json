@@ -1,6 +1,6 @@
 {
   "title": "蘇清的搜索增强 | SuQing's Search Enhancement",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "mod_id": "SuQingSearchEnhancement",
   "publishedfileid": "3834692575",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834692575",
@@ -10,11 +10,11 @@
     "Interface",
     "QoL"
   ],
-  "visibility": "private",
-  "visibility_note": "Uploaded and native-readback verified as private (Steam visibility2). Not a public release; gameplay acceptance unchanged.",
-  "status": "uploaded_verified_private",
+  "visibility": "public",
+  "visibility_note": "Current native readback reports public (Steam visibility0). Preserve the existing online choice when updating.",
+  "status": "existing_public_0.1.0_candidate_0.1.2_pending",
   "publication_authorized": true,
-  "user_instruction": "2026-11-06: user authorized checked Git and private Workshop uploads; gameplay acceptance remains unchanged.",
+  "user_instruction": "2026-11-07: user confirmed the 0.1.2 search-priority fix and authorized Git and existing Workshop updates; preserve existing visibility.",
   "online_lookup_performed": true,
   "existing_id_lookup": "Assigned once; later preparation must reuse publishing/workshop-item.json.",
   "prepared_at": "2026-11-06T21:53:02.361089+08:00",
@@ -40,11 +40,14 @@
     "prepared_at": "2026-11-06T21:49:29.875206+08:00"
   },
   "release_manifest": "release/0.1.0_20261106_215302_publication-repair/release-manifest.json",
-  "description_utf8_bytes": 7842,
-  "public": false,
+  "description_utf8_bytes": 7535,
+  "public": true,
   "native_readback_verified": true,
   "canonical_identity": "publishing/workshop-item.json",
   "uploaded": true,
-  "uploaded_verified_private": true,
-  "upload_authorized": true
+  "uploaded_verified_private": false,
+  "upload_authorized": true,
+  "candidate_status": "user-confirmed 0.1.2; native upload retry in progress after explicit CDN502 failures",
+  "candidate_uploaded": false,
+  "previous_uploaded_version": "0.1.0"
 }

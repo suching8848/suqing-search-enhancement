@@ -1,10 +1,12 @@
 {
-  "prepared_at_bjt": "2026-11-06T21:53:02.361089+08:00",
+  "prepared_at_bjt": "2026-11-07T06:36:52.146114+08:00",
   "mod_id": "SuQingSearchEnhancement",
-  "version": "0.1.0",
-  "release_manifest": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_215302_publication-repair\\release-manifest.json",
-  "workshop_upload_folder": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_215302_publication-repair\\workshop-upload\\SuQingSearchEnhancement",
+  "version": "0.1.2",
+  "release_manifest": "release/0.1.2_20261107_063652_publication-repair/release-manifest.json",
+  "workshop_upload_folder": "release/0.1.2_20261107_063652_publication-repair/workshop-upload/SuQingSearchEnhancement",
+  "workshop_item_id": "3834692575",
   "uploaded": false,
   "git_committed_or_pushed": false,
-  "description_utf8_bytes": 7842
+  "description_utf8_bytes": 7478,
+  "current_state_policy": "Immutable preparation snapshot; current Steam item state is in workshop-item.json."
 }

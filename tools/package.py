@@ -79,6 +79,11 @@ def main():
     assert current_files == set(validation["runtime_sha256"]), "runtime file set changed"
     logic_hashes = runtime_lua_hashes()
     gameplay_acceptance, acceptance_preserved = bound_gameplay_acceptance(project, logic_hashes)
+    prior_acceptance = project.get("gameplay_acceptance")
+    if not acceptance_preserved and isinstance(prior_acceptance, dict) and prior_acceptance.get("status") == "user_confirmed":
+        history = project.setdefault("gameplay_acceptance_history", [])
+        if project["gameplay_acceptance"] not in history:
+            history.append(copy.deepcopy(project["gameplay_acceptance"]))
     if install:
         check_game_exited()
     if args.install_new:
@@ -90,7 +95,9 @@ def main():
         assert re.search(r"^id=SuQingSearchEnhancement$", installed_info, re.M), "unexpected installation"
         expected_files = {path.relative_to(MOD) for path in MOD.rglob("*") if path.is_file()}
         assert all(path.relative_to(TARGET) in expected_files for path in TARGET.rglob("*") if path.is_file()), "unexpected local files require review"
-    before = protected_hashes()
+    # Freezing source is allowed while the user plays. Do not inspect mutable
+    # live-save files or interpret the game's own writes as packaging changes.
+    before = protected_hashes() if install else {}
     timestamp = datetime.now().astimezone()
     frozen = ROOT / "release" / (VERSION + "_" + timestamp.strftime("%Y%m%d_%H%M%S"))
     frozen.mkdir(parents=True, exist_ok=False)
@@ -139,7 +146,7 @@ def main():
                 for relative in previous_files:
                     assert digest(previous_installation / relative) == digest(TARGET / relative)
             raise
-    after = protected_hashes()
+    after = protected_hashes() if install else {}
     assert before == after, "protected files changed during packaging/install; inspect before continuing"
     operation = "update_existing" if args.update_existing else "install_new" if args.install_new else "freeze_only"
     if previous_installation:
@@ -169,6 +176,7 @@ def main():
         "runtime_lua_sha256": logic_hashes,
         "acceptance_binding_verified": acceptance_preserved,
         "protected_before": before, "protected_after": after,
+        "protected_files_check": "before/after hashes matched" if install else "not applicable: source-only freeze; live user data not accessed",
         "recovery": recovery,
         "runtime_files": sorted(str(path.relative_to(MOD)).replace("\\", "/") for path in MOD.rglob("*") if path.is_file()),
     }
@@ -181,10 +189,13 @@ def main():
         "local_installation": receipt["local_installation"] or project.get("local_installation"),
         "frozen_candidate": str(archive), "receipt": str(frozen / "receipt.json"),
         "validation": str(ROOT / "validation/result.json"),
-        "state": "offline passed; " + deployment_state + "; " + acceptance_state + "; Workshop not uploaded",
+        "state": "offline passed; " + deployment_state + "; " + acceptance_state + "; current candidate not uploaded to Workshop or committed to Git",
         "gameplay_acceptance": gameplay_acceptance,
-        "workshop": "not uploaded", "git": "not committed or pushed"
+        "candidate_publication": {"version": VERSION, "workshop_uploaded": False,
+                                  "git_committed": False, "git_pushed": False},
     })
+    if install:
+        project["local_installed_version"] = VERSION
     project_path.write_text(json.dumps(project, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({key: receipt[key] for key in (
         "archive", "archive_sha256", "archive_members", "local_installation",

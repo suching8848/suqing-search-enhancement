@@ -32,7 +32,7 @@ end
 -- Prefixes must be outside quotation marks: @"Mod Name", -"item name", &Base.Type.
 -- Quotes preserve literal spaces/pipes/prefixes, and accept \\" and \\\\ escapes.
 function Core.compile(query)
-    local result = { groups = {}, active = false }
+    local result = { groups = {}, active = false, special = false }
     if query == nil then return result end
     query = tostring(query)
     local length, position = #query, 1
@@ -48,6 +48,7 @@ function Core.compile(query)
         if isSpace(character) then
             position = position + 1
         elseif character == "|" then
+            result.special = true
             if #current == 0 then return fail("UI_SQSearch_ErrorEmptyOr") end
             result.groups[#result.groups + 1] = current
             current = {}
@@ -55,13 +56,16 @@ function Core.compile(query)
             position = position + 1
         else
             result.active = true
+            if #current > 0 then result.special = true end
             local term = { field = "name", negated = false }
             if character == "-" then
+                result.special = true
                 term.negated = true
                 position = position + 1
                 character = query:sub(position, position)
             end
             if character == "@" or character == "&" then
+                result.special = true
                 term.field = character == "@" and "mod" or "id"
                 position = position + 1
             end
@@ -70,6 +74,7 @@ function Core.compile(query)
             while position <= length do
                 character = query:sub(position, position)
                 if character == '"' then
+                    result.special = true
                     inQuote = not inQuote
                     position = position + 1
                 elseif inQuote and character == "\\" then
@@ -100,6 +105,14 @@ function Core.compile(query)
     if result.active and #current == 0 then return fail("UI_SQSearch_ErrorEmptyOr") end
     if #current > 0 then result.groups[#result.groups + 1] = current end
     return result
+end
+
+-- Use the parser's own grammar so source/ID prefixes, exclusions, OR, quoted
+-- phrases and whitespace AND all activate special-only integration. A literal
+-- hyphen/@/& within a name and surrounding whitespace retain native searching.
+-- Invalid special syntax still belongs to the enhanced parser's error display.
+function Core.hasSpecialSyntax(query)
+    return Core.compile(query).special == true
 end
 
 local function getMetadata(item)

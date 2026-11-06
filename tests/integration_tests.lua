@@ -1,8 +1,12 @@
 -- Isolated Lua tests; no game, Java objects, containers or saves are opened.
 local count = 0
+local Core = assert(SuQingSearch and SuQingSearch.Core, "load Core before integration tests")
 local function equal(actual, expected, label)
     assert(actual == expected, label .. ": expected " .. tostring(expected) .. ", got " .. tostring(actual))
     count = count + 1
+end
+local function ownSlot(object, name)
+    for key, value in pairs(object) do if key == name then return value end end
 end
 local function event()
     local callbacks = {}
@@ -27,6 +31,10 @@ local notifications = {}
 local function key(player, scope) return tostring(player) .. ":" .. scope end
 SuQingSearch = {
     getOptions = function() return settings end,
+    shouldHandleQuery = function(value)
+        return tostring(value or ""):find("%S") ~= nil
+            and (settings.searchHandling ~= "special" or Core.hasSpecialSyntax(value))
+    end,
     setQuery = function(player, text, scope, category, source)
         queryWrites = queryWrites + 1
         active[key(player, scope)] = { text = text, category = category, source = source }
@@ -314,6 +322,49 @@ inv.searchField:setText("M110Rifle")
 equal(active["0:inventory"].text, "M110Rifle", "compact English query reaches shared matcher")
 inv.searchField:setText(" \t ")
 equal(active["0:inventory"], nil, "whitespace clears field-owned shared query")
+
+settings.searchHandling = "special"
+inv.mode, inv.category, inv.text = "both", "Food", "hammer"
+M.refreshOptions()
+equal(active["0:inventory"], nil, "special-only policy clears ordinary enhanced query")
+equal(inv.native[1], "hammer", "ordinary search retains exact native text and highlighter")
+equal(inv.native[2], "Food", "ordinary native search retains category")
+inv.searchField:setText("@Brita hammer")
+equal(active["0:inventory"].text, "@Brita hammer", "special query uses enhancement in special-only policy")
+equal(inv.native[1], "", "special syntax does not enter native literal matching")
+inv.searchField:setText("hammer")
+equal(active["0:inventory"], nil, "removing special syntax clears stale enhanced results")
+equal(inv.native[1], "hammer", "removing special syntax restores native highlight route")
+for _, value in ipairs({"@", "&", "-", '"unfinished', "hammer |", "hammer saw", "hammer\\ saw"}) do
+    inv.searchField:setText(value)
+    equal(active["0:inventory"].text, value, "special and incomplete syntax remains enhanced: " .. value)
+end
+for _, value in ipairs({"hammer", "  hammer  ", "foo@bar", "mod-item", "NRB", "M110Rifle"}) do
+    equal(M.isSearchQuery(value), false, "plain query native policy: " .. value)
+end
+SuQingSearch.setQuery(0, "hammer", "inventory", "Food", "panel")
+M.syncPanel(0, "inventory", "hammer", "Food")
+M.refreshOptions()
+equal(active["0:inventory"].source, "panel", "explicit enhancement panel retains ownership in special-only mode")
+equal(inv.native[1], "", "explicit enhancement panel bypasses native literal matcher")
+inv.searchField:setText("hammer")
+equal(active["0:inventory"], nil, "ordinary field edit clears synchronized panel query in native policy")
+settings.searchHandling = "all"
+M.refreshOptions()
+equal(active["0:inventory"].text, "hammer", "all policy immediately resumes ordinary enhanced query")
+equal(inv.native[1], "", "all policy resumes enhanced highlighter route")
+
+-- PZ's usual class.__index = class inheritance, including the PZO table
+-- implementation, must not acquire a persistent per-instance method override.
+H.__index = H
+local direct = setmetatable({ text = "@Brita", control = {}, playerNum = 0,
+    inventoryWindow = { player = 0, onCharacter = true, inventoryPane = {} } }, H)
+direct:onSearchTextChange()
+equal(ownSlot(direct, "getSearchTexts"), nil, "PZ-style class inheritance retains no getter override")
+direct.fail = true
+equal(pcall(H.onSearchTextChange, direct), false, "PZ-style inherited callback errors surface")
+equal(ownSlot(direct, "getSearchTexts"), nil, "PZ-style inheritance restores exact slot on error")
+H.__index = nil
 
 local previous = H.onSearchTextChange
 dofile("mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua")

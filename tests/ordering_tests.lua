@@ -30,6 +30,10 @@ local function identitySelected(pane, item)
     for _, value in pairs(pane.selected) do if value == item then return true end end
     return false
 end
+local function ownSlot(object, name)
+    for key, value in pairs(object) do if key == name then return value end end
+    return nil
+end
 
 M.emit("OnGameStart")
 case()
@@ -202,11 +206,13 @@ pane.dragging = 1
 draw(pane, state)
 equal(pane.itemslist, firstList, "mouse-down pending drag does not replace/reorder row list")
 equal(pane.searchCalls, 0, "pre-drag gesture defers finalizer")
-pane.dragging = nil
+pane.dragging = 1
 pane.dragStarted = true
 draw(pane, state)
-equal(pane.searchCalls, 0, "active drag flag defers finalizer")
-pane.dragStarted = false
+equal(pane.searchCalls, 0, "active pane drag defers finalizer")
+-- Native/CleanUI release clears dragging but retains dragStarted until the next
+-- item mouse-down. Keep that real post-release value through the other guards.
+pane.dragging = nil
 pane.draggingMarquis = true
 draw(pane, state)
 equal(pane.searchCalls, 0, "marquee multi-selection defers finalizer")
@@ -224,6 +230,7 @@ end
 draw(pane, state)
 equal(pane.searchCalls, 1, "released gesture triggers pending ordering once")
 equal(M.order(pane), "B,D,A,C", "released gesture result order")
+equal(pane.dragStarted, true, "ordering does not rewrite the native historical drag flag")
 draw(pane, state)
 equal(pane.searchCalls, 1, "released gesture does not repeat refresh")
 
@@ -451,5 +458,147 @@ draw(pane, state)
 equal(M.order(pane), "B,D,A,C", "stale focus alone does not permanently defer ordering")
 equal(pane.items[pane.joyselection + 1], groups[4], "controller cursor follows group identity")
 M.dragReset()
+
+case()
+pane, state, items, groups = makeFour()
+draw(pane, state)
+pane.itemslist[1], pane.itemslist[2], pane.itemslist[3], pane.itemslist[4] = groups[1], groups[2], groups[3], groups[4]
+draw(pane, state)
+equal(M.order(pane), "B,D,A,C", "in-place external reorder invalidates presentation cache")
+equal(pane.searchCalls, 2, "in-place reorder uses one native baseline finalizer")
+draw(pane, state)
+equal(pane.searchCalls, 2, "repaired unchanged presentation does not rebuild again")
+
+case()
+pane, state, items, groups = makeFour()
+draw(pane, state)
+pane.selected[M.rowOf(pane, groups[1])] = groups[1]
+pane.firstSelect = M.rowOf(pane, groups[1])
+local nativeWipe, selectedWipes = table.wipe, 0
+table.wipe = function(values)
+    if values == pane.selected then selectedWipes = selectedWipes + 1 end
+    return nativeWipe(values)
+end
+draw(pane, state)
+table.wipe = nativeWipe
+equal(selectedWipes, 0, "unchanged cached draw does not wipe or rebuild selection")
+equal(getmetatable(pane.selected), nil, "unchanged cached draw creates no temporary selection owner")
+equal(pane.selected[M.rowOf(pane, groups[1])], groups[1], "unchanged cached draw retains native selection")
+
+case()
+pane, state = makeFour()
+draw(pane, state)
+local originalSearch = pane.searchContainer
+pane.searchContainer = function(self, ...)
+    -- Some native presentation adapters reuse the completed list for an
+    -- unchanged expression. A no-change partition still owns its earlier order.
+    if state.compiled.active then return "native search reused" end
+    return originalSearch(self, ...)
+end
+state.revision = state.revision + 1
+draw(pane, state)
+equal(M.order(pane), "B,D,A,C", "no-change revalidation retains the previous sorted presentation")
+state.compiled.active = false
+state.revision = state.revision + 1
+draw(pane, state)
+equal(M.order(pane), "A,B,C,D", "clearing after no-change revalidation still restores native order")
+
+case()
+pane, state, items, groups = makeFour()
+local function attachFilteredView(self)
+    self.neqFullItemList = self.itemslist
+    self.neqFilteredItemList = { groups[1], groups[2], groups[3], groups[4] }
+    self.neqFilteredFor = self.inventory
+end
+local refreshSlot = function(self, ...)
+    local result = ISInventoryPane.refreshContainer(self, ...)
+    attachFilteredView(self)
+    return result
+end
+pane.refreshContainer = refreshSlot
+attachFilteredView(pane)
+local function drawFiltered(self, dragged, ...)
+    self.neqHiding = true
+    self.itemslist = self.neqFilteredItemList
+    local r1, r2 = M.nativeRender(self, dragged, ...)
+    self.filteredDrawOrder = M.order(self)
+    self.itemslist = self.neqFullItemList
+    return r1, r2
+end
+draw(pane, state, false, drawFiltered)
+equal(pane.filteredDrawOrder, "B,D,A,C", "Neat hidden-equipment rendered view receives match priority")
+equal(M.order(pane), "B,D,A,C", "Neat full presentation receives the same match priority")
+equal(pane.refreshContainer, refreshSlot, "custom instance refresh slot restored after filtered draw")
+pane.neqFilteredItemList[1], pane.neqFilteredItemList[2] = pane.neqFilteredItemList[2], pane.neqFilteredItemList[1]
+draw(pane, state, false, drawFiltered)
+equal(pane.filteredDrawOrder, "B,D,A,C", "in-place filtered view reorder invalidates cache independently")
+pane.selected[M.rowOf(pane, groups[3])] = groups[3]
+pane.firstSelect = M.rowOf(pane, groups[3])
+draw(pane, state, false, drawFiltered)
+equal(pane.selected[M.rowOf(pane, groups[3])], groups[3], "filtered view selection follows actual rendered row")
+equal(pane.items[pane.firstSelect], groups[3], "filtered view Shift anchor remains the same physical group")
+state.compiled.active = false
+state.revision = state.revision + 1
+draw(pane, state, false, drawFiltered)
+equal(pane.filteredDrawOrder, "A,B,C,D", "clearing query restores full and filtered native presentation")
+
+case()
+pane, state, items, groups = makeFour()
+draw(pane, state)
+local function rebuildDuringRender(self, dragged, ...)
+    -- Models CleanUI's lazy weight-data refresh and Neat's equipment-set refresh,
+    -- both of which can happen with an unchanged query and a clean container.
+    local result = self:refreshContainer()
+    equal(result, "native-refresh-result", "in-render refresh return value preserved")
+    return M.nativeRender(self, dragged, ...)
+end
+draw(pane, state, false, rebuildDuringRender)
+equal(M.order(pane), "B,D,A,C", "refresh inside cached renderer is partitioned before that frame draws")
+equal(pane.items[1], groups[2], "first actual displayed row is matching after in-render rebuild")
+equal(pane.refreshCalls, 2, "in-render native finalizer reuses refresh instead of rebuilding again")
+equal(ownSlot(pane, "refreshContainer"), nil, "inherited refresh slot restored exactly after in-render rebuild")
+local afterRebuild = pane.searchCalls
+draw(pane, state)
+equal(pane.searchCalls, afterRebuild, "in-render rebuild updates cache to its completed presentation")
+
+case()
+pane, state, items, groups = makeFour("proxInv", true)
+pane.selected[M.rowOf(pane, items[3])] = items[3]
+pane.firstSelect = M.rowOf(pane, items[3])
+draw(pane, state)
+pane.refreshWhileRendering = true
+draw(pane, state)
+equal(pane.selected[M.rowOf(pane, items[3])], items[3], "real proximity bridge retains child through an in-render refresh")
+equal(pane.items[pane.firstSelect], items[3], "real proximity bridge retains Shift anchor through an in-render refresh")
+equal(getmetatable(pane.selected), nil, "real proximity bridge removes its owner after in-render refresh")
+
+case()
+pane, state, items, groups = makeFour()
+pane.refreshContainer = refreshSlot
+local function firstFilteredRender(self, dragged, ...)
+    -- Neat first enables its eye inside renderdetails, after the outer ordering
+    -- wrapper has already finalized and partitioned the previous full view.
+    self:refreshContainer()
+    return drawFiltered(self, dragged, ...)
+end
+draw(pane, state, false, firstFilteredRender)
+equal(pane.filteredDrawOrder, "B,D,A,C", "newly rebuilt Neat filtered array is sorted in its first rendered frame")
+equal(pane.refreshCalls, 2, "native search replay never duplicates Neat in-render refresh")
+equal(pane.refreshContainer, refreshSlot, "Neat custom refresh function retained after first eye frame")
+
+case()
+pane, state, items, groups = makeFour()
+draw(pane, state)
+local function failAfterRefresh(self, dragged)
+    self:refreshContainer()
+    error("mock failure after in-render refresh")
+end
+ok, message = pcall(draw, pane, state, false, failAfterRefresh)
+equal(ok, false, "post-refresh renderer error propagated")
+equal(tostring(message):find("mock failure after in-render refresh", 1, true) ~= nil, true, "post-refresh error message retained")
+equal(ownSlot(pane, "refreshContainer"), nil, "renderer error restores inherited refresh slot")
+equal(getmetatable(pane.selected), nil, "renderer error removes temporary selection owner")
+draw(pane, state)
+equal(M.order(pane), "B,D,A,C", "renderer failure leaves ordering retry available")
 
 return "SQSEARCH_ORDERING cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

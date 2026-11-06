@@ -1,32 +1,29 @@
 # SuQing's Search Enhancement
 
-Search logic inspired by Minecraft JEI. Find carried and nearby items by name, source mod, full item ID and optional pinyin. Highlight matches, show per-item counts and prioritize matching groups in existing detailed inventory lists.
+Search logic inspired by Minecraft JEI. Find carried and nearby items by name, source mod, full item ID and optional pinyin. Mark/count matches and prioritize matching groups in existing detailed lists.
 
 **Opening and settings**
-Press F8 to open the enhanced panel; the shortcut is configurable. Choose Carried or Nearby, insert query conditions and view usage hints. CleanUI 2.10.4 inventory fields integrate by default. Toggle this under Options > Mod Options > SuQing's Search Enhancement. Clicking an existing field to open the panel is off by default. The inventory context-menu entry is also hidden by default and can be enabled separately.
-Field integration, counts, result priority and available pinyin default to on. Click popup, expanded help and the context entry default to off. The core uses the game's built-in PZAPI/ModOptions and has no external hard requirement.
+F8 opens Carried/Nearby search. Eight personal settings under Options > Mod Options > SuQing's Search Enhancement control field integration, counts, priority and available pinyin (on by default), click popup, expanded help and context entry (off), and the shortcut (F8). The core uses the game's built-in settings API with no external hard requirement.
+A separate Sandbox Options > SuQing's Search Enhancement > Existing search-field handling setting defaults to all searches. Special syntax only keeps ordinary words/Chinese names with native matching and yellow highlights. @, &, -, |, quotes and whitespace AND activate enhancement; surrounding whitespace alone does not. The F8 panel always enhances searches. Missing values in old worlds use the default without editing the save.
+Enhanced hits have purple outlines plus original yellow search highlights. Selection/hover retain their backgrounds and the match outline. Priority follows filtering, in-place sorting and rendering refreshes while preserving order within groups. Clearing/disabling priority restores native order; dragging, mouse holds and marquee selection defer reordering. Priority resumes after drag release without another item-list click.
 
-**Query examples**
+**Queries**
 brewing: partial name match.
 @"Mod Name" brewing -book: source AND name, excluding book.
-&Chinesecuisine.BrewingBook34: exact full item ID, ignoring ASCII letter case.
-wrench | hammer: either group; spaces within each group mean AND.
-"item name": quotes combine text containing spaces into one condition.
-@vanilla: items identified as vanilla by the game.
-Names, item type names and source display names ignore ASCII case and tolerate whitespace, hyphens, underscores and pinyin apostrophes. There is no spelling correction. Full IDs never use partial or pinyin matching. @ModID uses the actual ID. Quotes do not enforce exact whitespace.
+&Chinesecuisine.BrewingBook34: exact full ID, ignoring ASCII case.
+wrench | hammer: either group; whitespace means AND and activates special handling.
+"item name": quotes group text containing spaces.
+@vanilla: game-identified vanilla source.
+Names, type names and source display names ignore ASCII case and tolerate whitespace, hyphens, underscores and pinyin apostrophes. No spelling correction. Full IDs never use partial/pinyin matching. @ModID uses the real source ID, distinct from Base namespaces or Workshop IDs. Quotes do not enforce exact whitespace.
 
-**Optional integrations**
-[Pinyin Search (yxjs_PinYinSearch 1.3)](https://steamcommunity.com/sharedfiles/filedetails/?id=3657184750): when enabled, supplies full spelling, initials and polyphonic alternatives, limited by its dictionary and pronunciation coverage. For example, NIUROUBING / NRB can find 牛肉饼 and M110BQ can find M110 步枪. Literal search remains available without it. Its code and dictionary are not bundled.
-[CleanUI 2.10.4](https://steamcommunity.com/sharedfiles/filedetails/?id=3437629766): adapts supported inventory fields, retains category conditions and synchronizes panel text and scope. Other UIs can use the F8 panel; their own fields require an adapter.
-[Proximity Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2847184718): supports projections of listed, readable physical sources with instance-based deduplication.
-These integrations are optional; installing all of them is unnecessary.
-
-**Scope, compatibility and removal**
-Targets Build 42.21 single-player. Highlighting and priority target detailed lists; icon-grid rendering is not adapted. Carried covers the main inventory and bags listed by the UI. Nearby reads listed, accessible, explored containers and visible floor items. It does not scan the world, inspect unexplored containers or generate loot.
-Priority preserves current order within matching and other groups. Clear the query or disable priority to restore native order. Reordering waits during dragging, mouse holds and marquee selection. Items and save structures are unchanged; queries are session-only. Exit normally, disable the mod and restart to remove its UI behavior. Manual and Workshop copies share one Mod ID; keep one loading source.
+**Optional integrations and scope**
+[Pinyin Search (yxjs_PinYinSearch 1.3)](https://steamcommunity.com/sharedfiles/filedetails/?id=3657184750): full spelling, initials and polyphonic alternatives, limited by its dictionary. NIUROUBING/NRB can find 牛肉饼; M110BQ can find M110 步枪. Its code/dictionary are not bundled.
+[CleanUI 2.10.4](https://steamcommunity.com/sharedfiles/filedetails/?id=3437629766): field integration retains categories and synchronizes text/scope. Other UIs can use F8; custom fields require adapters.
+[Proximity Inventory](https://steamcommunity.com/sharedfiles/filedetails/?id=2847184718): listed, readable physical sources with instance-based deduplication. All integrations are optional.
+Targets B42.21 single-player detailed lists; icon grids are not adapted. Carried reads listed inventory/bags; Nearby reads accessible, explored containers and visible floor items. No world scanning, exploration or loot generation. Items/save structures are unchanged; queries are session-only. Exit normally, disable and restart to remove UI behavior. Manual/Workshop copies share one Mod ID; keep one loading source.
 
 **Validation and assets**
-On 2026-11-06 the user reported normal search functionality in their current local B42.21 single-player setup. Version 0.1.0 retains the exact functional Lua files from that tested rc.3; this preparation updates metadata and release materials. Offline checks include 864 regression assertions, Chinese/English resources and image checks. No claim is made for tested multiplayer, other versions, every third-party combination, complete English UI gameplay acceptance or measured performance gains.
-The cover and separately created transparent icon use AI-assisted artwork. The promotional character is not an in-game skin or outfit. Thanks to the optional integration authors; upstream projects remain their authors' work.
+On 2026-11-07 the user confirmed the 0.1.2 search-priority fix in their current local B42.21 single-player setup; 1147 offline assertions passed. Exhaustive sandbox modes, complete English UI, controllers, all third-party combinations, other versions, multiplayer and performance gains remain unverified.
+Cover/separate transparent icon use AI-assisted artwork; the character is not an in-game skin/outfit. Thanks to integration authors; upstream rights remain theirs.
 
 Mod ID: SuQingSearchEnhancement
