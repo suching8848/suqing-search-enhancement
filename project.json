@@ -1,0 +1,72 @@
+{
+  "title_cn": "蘇清的搜索增强",
+  "title_en": "SuQing's Search Enhancement",
+  "mod_id": "SuQingSearchEnhancement",
+  "version": "0.1.0",
+  "source": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement",
+  "required_mods": [],
+  "native_api": "PZAPI/ModOptions",
+  "optional_integrations": [
+    "CleanUI 2.10.4",
+    "yxjs_PinYinSearch 1.3",
+    "ProximityInventory"
+  ],
+  "local_installation": "C:\\Users\\15792\\Zomboid\\mods\\SuQingSearchEnhancement",
+  "enabled_by_this_task": true,
+  "frozen_candidate": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_215302_publication-repair\\SuQingSearchEnhancement-0.1.0-manual.zip",
+  "receipt": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_215302_publication-repair\\receipt.json",
+  "validation": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\validation\\result.json",
+  "state": "user-confirmed runtime unchanged; revised bilingual copy frozen locally; not uploaded",
+  "workshop": "prepared locally; not uploaded",
+  "git": "not committed or pushed",
+  "enabled_save": "C:\\Users\\15792\\Zomboid\\Saves\\Sandbox\\2026-10-09_18-19-22",
+  "enable_receipt": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\deployment\\FormalSaveEnable_20261106_102851\\receipt.json",
+  "gameplay_acceptance": {
+    "status": "user_confirmed",
+    "tested_version": "0.1.0-rc.3",
+    "reported_at": "2026-11-06",
+    "source": "user message: 搜索增强功能测试正常",
+    "scope": "Current local B42.21 single-player setup; user reports search functionality normal",
+    "not_claimed": [
+      "complete English UI gameplay acceptance",
+      "all third-party combinations",
+      "controller gameplay acceptance",
+      "multiplayer or dedicated server",
+      "other game versions",
+      "measured performance gains"
+    ],
+    "runtime_lua_sha256": {
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "0d83de042cf5be03bd0a72959b706bddd03767f59d093ae0c4c037f59f7c587f",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "93df08c616d4a0ac5de8fb891ac1b83215d0d9f93eed17e333628ac5f60d2bb1",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "35df20cb78510ecdcad649764ce89862dfd5421609b0395ecfb5221dfec509eb",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "cca7c091c927876a69500684b0a509c6c125a6d1accceda5650d44d9b3c1c8ba",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
+      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "0b3903734c1e223ae8d1e71b6e589077f70adf2088c1c416154f1ed530fc4d1c",
+      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae"
+    }
+  },
+  "publication_authorized": false,
+  "local_installed_version": "0.1.0-rc.3",
+  "workshop_staging": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_215302_publication-repair\\workshop-upload\\SuQingSearchEnhancement",
+  "release_manifest": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_215302_publication-repair\\release-manifest.json",
+  "release_report": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\publishing\\待统一发布.md",
+  "cover_selection_pending": false,
+  "cover_candidates": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\candidate-manifest.json",
+  "selected_cover": {
+    "id": "D",
+    "label": "俯视整理桌",
+    "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\D_俯视整理桌.png",
+    "sha256": "be62c9d1f9e6a2df24cd08fd9011cc9bb50b4bb99a675c23bc30e4771e3cb07f",
+    "selected_at": "2026-11-06T17:19:45.501386+08:00",
+    "selection_evidence": "User: 那就d",
+    "generated_with": "built-in image_gen",
+    "prompt_file": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\prompts.json"
+  },
+  "previous_release_preparation": {
+    "frozen_candidate": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_214929_publication-repair\\SuQingSearchEnhancement-0.1.0-manual.zip",
+    "receipt": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_214929_publication-repair\\receipt.json",
+    "release_manifest": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_214929_publication-repair\\release-manifest.json",
+    "workshop_staging": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\release\\0.1.0_20261106_214929_publication-repair\\workshop-upload\\SuQingSearchEnhancement"
+  }
+}

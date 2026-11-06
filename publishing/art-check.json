@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-11-06T17:21:12.701641+08:00",
+  "timezone": "Asia/Shanghai",
+  "scope": "Selected D cover export and offline visual/file QA; icon retained and hash-verified; no game operation, upload, Git or personal deployment",
+  "result": "passed; user-selected cover D exported; existing icon unchanged",
+  "functional_feedback": {
+    "status": "user reported search enhancement functionality normal",
+    "scope": "user feedback for current tested functionality; does not establish all UI combinations, multiplayer support or separate artwork acceptance"
+  },
+  "art_acceptance": {
+    "offline_qa": "passed",
+    "cover_user_selection": {
+      "status": "user_selected",
+      "candidate": "D",
+      "label": "俯视整理桌",
+      "message": "那就d",
+      "recorded_at": "2026-11-06T17:21:12.701641+08:00",
+      "source": "User explicit selection of candidate D"
+    },
+    "separate_user_artwork_acceptance": "User explicitly selected cover candidate D; icon retained from previous version"
+  },
+  "publication": {
+    "status": "not published by this task",
+    "online_query_performed": false
+  },
+  "original_provenance_created_at": "2026-11-06T10:03:16.114449+08:00",
+  "references": [
+    {
+      "role": "canonical character identity",
+      "path": "C:\\Users\\15792\\Desktop\\图图\\ChatGPT 图像 2026年10月26日 01_13_03.png",
+      "sha256": "ae98092347606047e26c85bff43b6b06107b34aa1206f36aea71f09409be499b",
+      "exists": true,
+      "matches_candidate_manifest": true
+    },
+    {
+      "role": "approved fixed-buyback series rendering and lower plaque",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-mfs-fixed-buyback\\art\\cover-source.png",
+      "sha256": "8260f50c12bd7b6ed2cce2899e63860d480249b35caf9f70dd6ad7ec87cf9f1b",
+      "exists": true,
+      "matches_candidate_manifest": true
+    },
+    {
+      "role": "user-selected freshness-fridge B series rendering and lower plaque",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-freshness-fridge\\art\\cover-candidates_20261105\\B_夜间工坊.png",
+      "sha256": "327e59822cd9ea86ed0a83762a94a8dad90d96f9d4956f171a3a48d8d57cdb19",
+      "exists": true,
+      "matches_candidate_manifest": true
+    },
+    {
+      "role": "user-selected irrigation cover series rendering and lower plaque",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-sprinkler-fertilizer\\art\\cover-source.png",
+      "sha256": "b8b0f0a737c6fd324668f3b4036ecdf943836680dd89c9338bc6bc24ac8ec556",
+      "exists": true,
+      "matches_candidate_manifest": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-original.png",
+      "relative_path": "art/cover-original.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "color_mode": "RGB",
+      "alpha_extrema": null,
+      "sha256": "be62c9d1f9e6a2df24cd08fd9011cc9bb50b4bb99a675c23bc30e4771e3cb07f",
+      "visual_inspected": true,
+      "note": "Selected D: full candidate and actual 512px exported preview inspected; no crop or content edit"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\icon-original.png",
+      "relative_path": "art/icon-original.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "511370a845e2cb2167dde566f915f79eeb44cc74934b6baad60db9e86c9ce863",
+      "visual_inspected": true,
+      "note": "Icon bytes unchanged; prior full/128/64/32 visual QA remains valid"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\poster.png",
+      "relative_path": "mods/SuQingSearchEnhancement/42/poster.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_mode": "RGB",
+      "alpha_extrema": null,
+      "sha256": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9",
+      "visual_inspected": true,
+      "note": "Selected D: full candidate and actual 512px exported preview inspected; no crop or content edit"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\icon.png",
+      "relative_path": "mods/SuQingSearchEnhancement/42/icon.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        128,
+        128
+      ],
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "0d8d69e530fe768d73e2a7d0531ac4b4677c38cee34a16d5bdecf886950daa99",
+      "visual_inspected": true,
+      "note": "Icon bytes unchanged; prior full/128/64/32 visual QA remains valid"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\icon-preview-64.png",
+      "relative_path": "art/icon-preview-64.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        64,
+        64
+      ],
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "aab339b514017a6009d99e0a16e54d0b2a2d4868f17a28d448fd0817648d2141",
+      "visual_inspected": true,
+      "note": "Icon bytes unchanged; prior full/128/64/32 visual QA remains valid"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\icon-preview-32.png",
+      "relative_path": "art/icon-preview-32.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        32,
+        32
+      ],
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "ee87722c0b593bbed68070a53cc95c5722e6549689a8a893c36603475da0ca02",
+      "visual_inspected": true,
+      "note": "Icon bytes unchanged; prior full/128/64/32 visual QA remains valid"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\publishing\\preview.png",
+      "relative_path": "publishing/preview.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_mode": "RGB",
+      "alpha_extrema": null,
+      "sha256": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9",
+      "visual_inspected": true,
+      "note": "Selected D: full candidate and actual 512px exported preview inspected; no crop or content edit"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\D_俯视整理桌.png",
+      "relative_path": "art/cover-candidates_20261106/D_俯视整理桌.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "color_mode": "RGB",
+      "alpha_extrema": null,
+      "sha256": "be62c9d1f9e6a2df24cd08fd9011cc9bb50b4bb99a675c23bc30e4771e3cb07f",
+      "visual_inspected": true,
+      "note": "User-selected D candidate; byte-identical to current master"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\archive\\cover-before-D_20261106.png",
+      "relative_path": "art/archive/cover-before-D_20261106.png",
+      "format": "PNG",
+      "png_signature_verified": true,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "color_mode": "RGB",
+      "alpha_extrema": null,
+      "sha256": "3d749dae6e9ab11d542867657d2f9cf364e09119dfb8eb0b75b03fc116d49308",
+      "visual_inspected": true,
+      "note": "Preserved original pre-D master; archival only"
+    }
+  ],
+  "visual_and_resource_checks": {
+    "character_identity": "pass: silver-white long hair, lilac eyes, paired pale horns, pale-lavender wings, white scaled tail, rose accents and white/lavender series palette retained",
+    "cover_theme": "pass: top-down scene shows magnifier aimed at a useful supply, open chest and backpack; carried/nearby search is clear",
+    "title_cn": {
+      "expected": "蘇清的搜索增强",
+      "visible": "蘇清的 / 搜索增强",
+      "result": "pass: two-line series layout"
+    },
+    "title_en": {
+      "expected": "SuQing's Search Enhancement",
+      "visible": "SuQing’s Search Enhancement",
+      "result": "pass; typographic apostrophe does not change the title"
+    },
+    "game_version_on_image": false,
+    "cropping": "pass: 1254px square resized to 512px square without crop. Title, face, magnifier, open chest and backpack stay inside; intentional top-edge horn framing retained from selected D.",
+    "icon_128": "pass: magnifier, chest, horns/wings/tail and rose emblem readable",
+    "icon_64": "pass: magnifier and chest are clear; series dragon silhouette retained",
+    "icon_32": "pass: core magnifier/chest badge silhouette recognizable; fine floral texture naturally simplified",
+    "format_and_alpha": "pass: genuine PNG signature and decode; cover/poster RGB opaque, icon masters/exports RGBA with alpha 0..255",
+    "resource_references": {
+      "mod_info": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\mod.info",
+      "poster": "poster.png",
+      "icon": "icon.png",
+      "result": "pass: both referenced sibling files exist, exact case matches"
+    },
+    "master_and_provenance_hashes": "pass: selected D=current master; poster=preview; previous master archive matches old recorded hash; four current references match candidate manifest",
+    "new_generation_or_image_edit": false,
+    "art_rework_required": false,
+    "export_operation": "size-only LANCZOS resize; no content edits",
+    "selected_cover": "D",
+    "selected_preview_inspected_size": [
+      512,
+      512
+    ]
+  },
+  "preview": {
+    "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\publishing\\preview.png",
+    "source": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\poster.png",
+    "byte_identical": true,
+    "sha256": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9",
+    "selected_candidate": "D",
+    "actual_512_preview_visually_inspected": true
+  },
+  "qa_history": [
+    {
+      "checked_at": "2026-11-06T16:28:07.513024+08:00",
+      "result": "passed; existing art retained without rework",
+      "art_acceptance": {
+        "offline_qa": "passed",
+        "separate_user_artwork_acceptance": "not separately recorded; do not infer from functional feedback"
+      },
+      "cover_assets": [
+        {
+          "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-original.png",
+          "relative_path": "art/cover-original.png",
+          "format": "PNG",
+          "png_signature_verified": true,
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "color_mode": "RGB",
+          "alpha_extrema": null,
+          "sha256": "3d749dae6e9ab11d542867657d2f9cf364e09119dfb8eb0b75b03fc116d49308",
+          "visual_inspected": true,
+          "note": "view_image inspection at stored dimensions"
+        },
+        {
+          "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\poster.png",
+          "relative_path": "mods/SuQingSearchEnhancement/42/poster.png",
+          "format": "PNG",
+          "png_signature_verified": true,
+          "dimensions": [
+            512,
+            512
+          ],
+          "color_mode": "RGB",
+          "alpha_extrema": null,
+          "sha256": "b2fab1b2d0f2e596c93229e326d0d3886cf90eda4717d696ef01c9f2ae769887",
+          "visual_inspected": true,
+          "note": "view_image inspection at stored dimensions"
+        },
+        {
+          "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\publishing\\preview.png",
+          "relative_path": "publishing/preview.png",
+          "format": "PNG",
+          "png_signature_verified": true,
+          "dimensions": [
+            512,
+            512
+          ],
+          "color_mode": "RGB",
+          "alpha_extrema": null,
+          "sha256": "b2fab1b2d0f2e596c93229e326d0d3886cf90eda4717d696ef01c9f2ae769887",
+          "visual_inspected": false,
+          "note": "byte-identical copy of inspected poster.png; no image edit"
+        }
+      ],
+      "references": [
+        {
+          "path": "C:\\Users\\15792\\Desktop\\图图\\ChatGPT 图像 2026年10月26日 01_13_03.png",
+          "role": "canonical character identity",
+          "exists": true,
+          "sha256": "ae98092347606047e26c85bff43b6b06107b34aa1206f36aea71f09409be499b",
+          "matches_original_provenance": true
+        },
+        {
+          "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-freshness-fridge\\art\\cover-original.png",
+          "role": "approved series style and title treatment",
+          "exists": true,
+          "sha256": "bb0115e9ae005085f04bc7f537451ba1c5e7d3d50a10ff125a6522f20fc05d11",
+          "matches_original_provenance": true
+        }
+      ],
+      "note": "Historical pre-D cover QA; old cover master preserved in art/archive/cover-before-D_20261106.png"
+    }
+  ],
+  "icon_hashes_unchanged": {
+    "art/icon-original.png": "511370a845e2cb2167dde566f915f79eeb44cc74934b6baad60db9e86c9ce863",
+    "mods/SuQingSearchEnhancement/42/icon.png": "0d8d69e530fe768d73e2a7d0531ac4b4677c38cee34a16d5bdecf886950daa99",
+    "art/icon-preview-64.png": "aab339b514017a6009d99e0a16e54d0b2a2d4868f17a28d448fd0817648d2141",
+    "art/icon-preview-32.png": "ee87722c0b593bbed68070a53cc95c5722e6549689a8a893c36603475da0ca02"
+  }
+}

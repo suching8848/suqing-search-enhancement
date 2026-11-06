@@ -1,0 +1,14 @@
+发布资料修复结果
+准备时间：2026-11-06T21:53:02.361089+08:00
+项目：SuQingSearchEnhancement 0.1.0
+中英用户开场文案已同步。介绍 7842 个 UTF-8 字节。
+候选清单：D:\steam\steamapps\common\ProjectZomboid\CodexRepos\suqing-search-enhancement\release\0.1.0_20261106_215302_publication-repair\release-manifest.json
+原生上传目录：D:\steam\steamapps\common\ProjectZomboid\CodexRepos\suqing-search-enhancement\release\0.1.0_20261106_215302_publication-repair\workshop-upload\SuQingSearchEnhancement
+工坊 ZIP：D:\steam\steamapps\common\ProjectZomboid\CodexRepos\suqing-search-enhancement\release\0.1.0_20261106_215302_publication-repair\SuQingSearchEnhancement-0.1.0-workshop-ready.zip
+手动 ZIP：D:\steam\steamapps\common\ProjectZomboid\CodexRepos\suqing-search-enhancement\release\0.1.0_20261106_215302_publication-repair\SuQingSearchEnhancement-0.1.0-manual.zip
+运行逻辑、选定美术及独立 icon 未变；旧候选与个人安装不覆盖。CN/EN键与占位符核对、原生字段读回、图片格式/尺寸/字节限制、ZIP CRC及全成员读回通过。
+没有启动游戏、部署、修改名单/配置/存档、Git提交/推送或工坊上传。
+仍待验收：complete English UI gameplay acceptance; all third-party combinations; controller gameplay acceptance; multiplayer or dedicated server; other game versions; measured performance gains
+本次检查不替代游戏内验证；行为回归数字仅沿用与未改运行文件绑定的历史记录。
+
+Publication copy synchronized in both languages. A new native-upload candidate and verified archives were created; the runtime logic, selected artwork and independent icon are unchanged. No deployment, gameplay test, Git commit/push or Workshop upload was performed. Gameplay acceptance boundaries remain as recorded in the manifest.

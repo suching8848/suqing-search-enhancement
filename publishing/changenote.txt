@@ -1,0 +1,6 @@
+0.1.0 · 2026-11-06
+中文：首个待统一发布版本。提供随身／附近增强搜索、默认 F8、可配置原框接入及左键弹出、来源／完整 ID／组合条件、可选全拼和首字母、大小写宽松匹配、计数及匹配组置顶。右键入口默认隐藏。交付中英文本、系列封面和独立透明 icon。用户已反馈当前 B42.21 单人功能正常；与已测 rc.3 的功能 Lua 完全一致。本地资料准备完成，尚未上传。
+English: First version prepared for batch publication. Includes carried/nearby search, configurable F8 and field integration/click popup, source/full-ID/compound conditions, optional full/initial pinyin, case-tolerant matching, counts and result priority. Context entry is hidden by default. Includes Chinese/English text, series cover and a separate transparent icon. The user reports normal functionality in their current B42.21 single-player setup; functional Lua is identical to the tested rc.3. Materials are local and have not been uploaded.
+
+发布资料修订：同步用户修改的中英开场文案，运行代码未变。
+Publication copy revision: synchronized the user-edited opening copy in both languages; runtime code unchanged.

@@ -1,0 +1,13 @@
+{
+  "required": [],
+  "native_api": "PZAPI/ModOptions (included with the game)",
+  "optional": [
+    {"workshop_id": "3657184750", "mod_id": "yxjs_PinYinSearch", "reviewed_version": "1.3", "purpose": "Full/initial pinyin through the enabled upstream API"},
+    {"workshop_id": "3437629766", "mod_id": "CleanUI", "reviewed_version": "2.10.4", "purpose": "Integration with supported existing inventory search fields"},
+    {"workshop_id": "2847184718", "mod_id": "ProximityInventory", "purpose": "Listed readable physical-source projections"}
+  ],
+  "reviewed_local_bridges_not_required": ["PinyinSearch_SafeSources_4221_LocalFix", "SuQingUIInteractionFixes", "Codex_InventoryTransferPerformance_4221"],
+  "source": "Current installed mod.info files and source adapters; local preparation only",
+  "online_dependencies_modified": false,
+  "note": "Optional integrations must not be configured as mandatory Workshop dependencies. No Steam operation is performed by this file."
+}

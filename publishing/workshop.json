@@ -1,0 +1,50 @@
+{
+  "title": "蘇清的搜索增强 | SuQing's Search Enhancement",
+  "version": "0.1.0",
+  "mod_id": "SuQingSearchEnhancement",
+  "publishedfileid": "3834692575",
+  "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3834692575",
+  "github": "https://github.com/suching8848/suqing-search-enhancement",
+  "tags": [
+    "Build 42",
+    "Interface",
+    "QoL"
+  ],
+  "visibility": "private",
+  "visibility_note": "Uploaded and native-readback verified as private (Steam visibility2). Not a public release; gameplay acceptance unchanged.",
+  "status": "uploaded_verified_private",
+  "publication_authorized": true,
+  "user_instruction": "2026-11-06: user authorized checked Git and private Workshop uploads; gameplay acceptance remains unchanged.",
+  "online_lookup_performed": true,
+  "existing_id_lookup": "Assigned once; later preparation must reuse publishing/workshop-item.json.",
+  "prepared_at": "2026-11-06T21:53:02.361089+08:00",
+  "local_upload_folder": "release/0.1.0_20261106_215302_publication-repair/workshop-upload/SuQingSearchEnhancement",
+  "runtime_archive": "release/0.1.0_20261106_215302_publication-repair/SuQingSearchEnhancement-0.1.0-manual.zip",
+  "upload_archive": "release/0.1.0_20261106_215302_publication-repair/SuQingSearchEnhancement-0.1.0-workshop-ready.zip",
+  "cover_selection_pending": false,
+  "cover_candidates": "art/cover-candidates_20261106/candidate-manifest.json",
+  "selected_cover": {
+    "id": "D",
+    "label": "俯视整理桌",
+    "path": "art/cover-candidates_20261106/D_俯视整理桌.png",
+    "sha256": "be62c9d1f9e6a2df24cd08fd9011cc9bb50b4bb99a675c23bc30e4771e3cb07f",
+    "selected_at": "2026-11-06T17:19:45.501386+08:00",
+    "selection_evidence": "User: 那就d",
+    "generated_with": "built-in image_gen",
+    "prompt_file": "art/cover-candidates_20261106/prompts.json"
+  },
+  "previous_release_preparation": {
+    "local_upload_folder": "release/0.1.0_20261106_214929_publication-repair/workshop-upload/SuQingSearchEnhancement",
+    "runtime_archive": "release/0.1.0_20261106_214929_publication-repair/SuQingSearchEnhancement-0.1.0-manual.zip",
+    "upload_archive": "release/0.1.0_20261106_214929_publication-repair/SuQingSearchEnhancement-0.1.0-workshop-ready.zip",
+    "prepared_at": "2026-11-06T21:49:29.875206+08:00"
+  },
+  "release_manifest": "release/0.1.0_20261106_215302_publication-repair/release-manifest.json",
+  "description_utf8_bytes": 7842,
+  "public": false,
+  "native_readback_verified": true,
+  "canonical_identity": "publishing/workshop-item.json",
+  "uploaded": true,
+  "uploaded_verified_private": true,
+  "upload_authorized": true
+}

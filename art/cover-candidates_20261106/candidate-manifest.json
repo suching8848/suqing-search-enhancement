@@ -1,0 +1,148 @@
+{
+  "created_at": "2026-11-06T17:13:43.355169+08:00",
+  "status": "selected",
+  "generated_with": "built-in image_gen",
+  "prompt_file": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\prompts.json",
+  "candidates": [
+    {
+      "id": "A",
+      "label": "暖灯仓库",
+      "file": "A_暖灯仓库.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-cc49f32c-3514-40db-bdb0-f12f6ce67054.png",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\A_暖灯仓库.png",
+      "sha256": "0712b5d103ca5611a10496a577a7581bbebc94798e1695f550c9946f2a4ad060",
+      "size": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGB",
+      "selection_status": "not_selected"
+    },
+    {
+      "id": "B",
+      "label": "月夜旅行背包",
+      "file": "B_月夜旅行背包.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-3362dd02-1a85-4a46-bc2b-2473656244f5.png",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\B_月夜旅行背包.png",
+      "sha256": "5cc01b59b41e0126e0806d89615d21e591e6c805c45d721dda1a771e24eb9ba6",
+      "size": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGB",
+      "selection_status": "not_selected"
+    },
+    {
+      "id": "C",
+      "label": "档案书库",
+      "file": "C_档案书库.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-a4ee7448-9aa2-423b-a6c4-9b2785b63dc5.png",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\C_档案书库.png",
+      "sha256": "305c6dfeee05b3f14eb04fe78acd0999c5bee85b89d7bba8f46972d2d447d509",
+      "size": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGB",
+      "selection_status": "not_selected"
+    },
+    {
+      "id": "D",
+      "label": "俯视整理桌",
+      "file": "D_俯视整理桌.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-346cff07-60cd-43bf-af7b-02c77252ae60.png",
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\D_俯视整理桌.png",
+      "sha256": "be62c9d1f9e6a2df24cd08fd9011cc9bb50b4bb99a675c23bc30e4771e3cb07f",
+      "size": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGB",
+      "selection_status": "selected"
+    }
+  ],
+  "selected": "D",
+  "existing_poster_replaced": true,
+  "existing_icon_modified": false,
+  "published": false,
+  "previous_assets_verified_unchanged": {
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-original.png": "3d749dae6e9ab11d542867657d2f9cf364e09119dfb8eb0b75b03fc116d49308",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\poster.png": "b2fab1b2d0f2e596c93229e326d0d3886cf90eda4717d696ef01c9f2ae769887",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\icon-original.png": "511370a845e2cb2167dde566f915f79eeb44cc74934b6baad60db9e86c9ce863",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\icon.png": "0d8d69e530fe768d73e2a7d0531ac4b4677c38cee34a16d5bdecf886950daa99",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\publishing\\preview.png": "b2fab1b2d0f2e596c93229e326d0d3886cf90eda4717d696ef01c9f2ae769887"
+  },
+  "references": [
+    "C:\\Users\\15792\\Desktop\\图图\\ChatGPT 图像 2026年10月26日 01_13_03.png",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-mfs-fixed-buyback\\art\\cover-source.png",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-freshness-fridge\\art\\cover-candidates_20261105\\B_夜间工坊.png",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-sprinkler-fertilizer\\art\\cover-source.png"
+  ],
+  "reference_sha256": {
+    "C:\\Users\\15792\\Desktop\\图图\\ChatGPT 图像 2026年10月26日 01_13_03.png": "ae98092347606047e26c85bff43b6b06107b34aa1206f36aea71f09409be499b",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-mfs-fixed-buyback\\art\\cover-source.png": "8260f50c12bd7b6ed2cce2899e63860d480249b35caf9f70dd6ad7ec87cf9f1b",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-freshness-fridge\\art\\cover-candidates_20261105\\B_夜间工坊.png": "327e59822cd9ea86ed0a83762a94a8dad90d96f9d4956f171a3a48d8d57cdb19",
+    "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-sprinkler-fertilizer\\art\\cover-source.png": "b8b0f0a737c6fd324668f3b4036ecdf943836680dd89c9338bc6bc24ac8ec556"
+  },
+  "visual_qa": {
+    "reviewer": "primary assistant",
+    "viewed": "all four full generated images",
+    "series_style": "anime/pixel hybrid, warm/purple light, embroidered purple/gold lower plaque",
+    "titles": "Chinese and English content visually checked; no game or mod version",
+    "identity": "silver-white hair, lilac eyes, paired horns, wings, scaled white tail retained",
+    "composition_note": "upper horn tips meet or slightly leave the canvas in some images; subject remains identifiable",
+    "selection_recommendation": "D for the clearest carried/nearby-search theme; A for the warmest series match",
+    "selected": true,
+    "selected_candidate": "D",
+    "selected_preview_viewed": true,
+    "selected_preview_size": [
+      512,
+      512
+    ],
+    "selected_preview_checked_at": "2026-11-06T17:21:12.701641+08:00",
+    "selected_preview_result": "Chinese and English titles, face, magnifier, chest and backpack remain legible; no extra crop. Upper horn meets canvas edge as in source."
+  },
+  "selected_path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-candidates_20261106\\D_俯视整理桌.png",
+  "selected_sha256": "be62c9d1f9e6a2df24cd08fd9011cc9bb50b4bb99a675c23bc30e4771e3cb07f",
+  "selection": {
+    "status": "user_selected",
+    "candidate": "D",
+    "label": "俯视整理桌",
+    "message": "那就d",
+    "recorded_at": "2026-11-06T17:21:12.701641+08:00",
+    "source": "User explicit selection of candidate D"
+  },
+  "selected_at": "2026-11-06T17:21:12.701641+08:00",
+  "master_path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\cover-original.png",
+  "previous_master_archive": {
+    "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\art\\archive\\cover-before-D_20261106.png",
+    "sha256": "3d749dae6e9ab11d542867657d2f9cf364e09119dfb8eb0b75b03fc116d49308"
+  },
+  "exports": [
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\mods\\SuQingSearchEnhancement\\42\\poster.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "format": "PNG",
+      "mode": "RGB",
+      "sha256": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\CodexRepos\\suqing-search-enhancement\\publishing\\preview.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "format": "PNG",
+      "mode": "RGB",
+      "sha256": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9"
+    }
+  ],
+  "export_operation": "Equal-aspect 1254x1254 to 512x512 LANCZOS resize only; no content edits; poster and preview byte-identical"
+}

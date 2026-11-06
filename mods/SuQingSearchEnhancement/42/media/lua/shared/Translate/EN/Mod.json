@@ -1,0 +1,4 @@
+{
+  "name": "SuQing's Search Enhancement",
+  "description": "Search carried items and currently listed, accessible, explored nearby containers. Supports names, @mod, ASCII case-insensitive exact &Full.Type, AND, exclusions, OR and quotes that group text. Detailed-list highlights and result priority preserve native order within groups; clearing restores native order. The icon-grid view is not adapted. Optional pinyin depends on the enabled upstream provider and dictionary. Text matching is ASCII case-insensitive and separator-tolerant, including quoted text. F8 opens the panel; supported inventory fields integrate by default. The inventory context entry and click-to-open are off by default. Configure eight settings in native Mod Options. No hard external prerequisite. User reported working functionality in their local B42.21 single-player setup on 2026-11-06; other setups and multiplayer remain unverified. Version 0.1.0 is prepared locally, not published."
+}

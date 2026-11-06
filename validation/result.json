@@ -1,0 +1,90 @@
+{
+  "result": "PASS",
+  "checked_at": "2026-11-06T17:19:53.477955+08:00",
+  "game_version": "42.21.0",
+  "lua_product_files": 8,
+  "runtime_classpath": [
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\pzopt\\aot\\pzopt.jar",
+      "sha256": "749cad6f1fe98a37b908583eaf5328ca85f75b80431edc5d31bec1127519639e"
+    },
+    {
+      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\projectzomboid.jar",
+      "sha256": "e1a69eb743ede60b213a0fe7f8b83d4fcab773036d256cc4543a336f3b058a33"
+    }
+  ],
+  "regression": {
+    "core": {
+      "assertions": 141,
+      "cases": 92
+    },
+    "integration": {
+      "assertions": 123
+    },
+    "runtime": {
+      "assertions": 89,
+      "cases": 12
+    },
+    "panel": {
+      "assertions": 131,
+      "cases": 13
+    },
+    "ordering": {
+      "assertions": 156,
+      "cases": 24
+    },
+    "text_CN": {
+      "assertions": 86,
+      "cases": 51
+    },
+    "pinyin_runtime": {
+      "assertions": 52,
+      "cases": 7
+    },
+    "text_CH": {
+      "assertions": 86,
+      "cases": 51
+    }
+  },
+  "assertions": 864,
+  "ordering_compatibility_source": {
+    "path": "C:\\Users\\15792\\Zomboid\\mods\\SuQingUIInteractionFixes\\42\\media\\lua\\client\\SuQing_ProximitySelectionFix.lua",
+    "sha256": "5d41ca3e3729d81c0709439ee602b366222fba238f8f2a9211ef848da47e549f"
+  },
+  "pinyin_compatibility_sources": {
+    "provider": {
+      "path": "D:\\steam\\steamapps\\workshop\\content\\108600\\3657184750\\mods\\PinYinSearch\\42.0\\media\\lua\\client\\pinyin.lua",
+      "sha256": "37c37fc233bc57b18fd058a67071bdeb0123ff0529e7d2acd6f62db74f1bcca2"
+    },
+    "dictionaries": {
+      "CN": {
+        "path": "D:\\steam\\steamapps\\workshop\\content\\108600\\3657184750\\mods\\PinYinSearch\\42.0\\media\\lua\\shared\\Translate\\CN\\UI.json",
+        "sha256": "ff13aed689eaade41a9160332daa87fc4bac885f6f172493ac415e5f4b178a7e"
+      },
+      "CH": {
+        "path": "D:\\steam\\steamapps\\workshop\\content\\108600\\3657184750\\mods\\PinYinSearch\\42.0\\media\\lua\\shared\\Translate\\CH\\UI.json",
+        "sha256": "ff13aed689eaade41a9160332daa87fc4bac885f6f172493ac415e5f4b178a7e"
+      }
+    }
+  },
+  "bilingual_ui_keys": 34,
+  "game_started": false,
+  "gameplay_acceptance": "not evaluated by offline tests; see project.json gameplay_acceptance",
+  "runtime_sha256": {
+    "mods/SuQingSearchEnhancement/42/icon.png": "0d8d69e530fe768d73e2a7d0531ac4b4677c38cee34a16d5bdecf886950daa99",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "0d83de042cf5be03bd0a72959b706bddd03767f59d093ae0c4c037f59f7c587f",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "93df08c616d4a0ac5de8fb891ac1b83215d0d9f93eed17e333628ac5f60d2bb1",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "35df20cb78510ecdcad649764ce89862dfd5421609b0395ecfb5221dfec509eb",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "cca7c091c927876a69500684b0a509c6c125a6d1accceda5650d44d9b3c1c8ba",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "0b3903734c1e223ae8d1e71b6e589077f70adf2088c1c416154f1ed530fc4d1c",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/CN/Mod.json": "07056d948218bee50c05baa59fb99ba64fe09d4c4c8f3e20ffc919a380f79854",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/CN/UI.json": "b46a1a85955e72476c1429655e0c330ccac43d5dce0b8328ad3f984f6a92a6d6",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/EN/Mod.json": "27a878b9efb7e33220f6e1154fcea460385fdfba386a00c5c6f35f0bada535cb",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/EN/UI.json": "97262202489a890d8f596b25b0307ad7723dd0131bbe00e6bde00aa8cebd2c43",
+    "mods/SuQingSearchEnhancement/42/mod.info": "7378abeecdf982ee1b375d1016de9b43c07401478d38cb9a0444923125de5259",
+    "mods/SuQingSearchEnhancement/42/poster.png": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9"
+  }
+}

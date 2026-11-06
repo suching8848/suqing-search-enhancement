@@ -1,0 +1,30 @@
+{
+  "mode": "built-in image_gen",
+  "status": "generated_pending_selection",
+  "entries": [
+    {
+      "id": "A",
+      "label": "暖灯仓库",
+      "file": "A_暖灯仓库.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-cc49f32c-3514-40db-bdb0-f12f6ce67054.png"
+    },
+    {
+      "id": "B",
+      "label": "月夜旅行背包",
+      "file": "B_月夜旅行背包.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-3362dd02-1a85-4a46-bc2b-2473656244f5.png"
+    },
+    {
+      "id": "C",
+      "label": "档案书库",
+      "file": "C_档案书库.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-a4ee7448-9aa2-423b-a6c4-9b2785b63dc5.png"
+    },
+    {
+      "id": "D",
+      "label": "俯视整理桌",
+      "file": "D_俯视整理桌.png",
+      "generated_source": "C:\\Users\\15792\\.codex\\generated_images\\01a1a49a-4324-71a2-965b-fdea1fdfe74f\\exec-346cff07-60cd-43bf-af7b-02c77252ae60.png"
+    }
+  ]
+}
