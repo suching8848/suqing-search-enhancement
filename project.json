@@ -2,7 +2,7 @@
   "title_cn": "蘇清的搜索增强",
   "title_en": "SuQing's Search Enhancement",
   "mod_id": "SuQingSearchEnhancement",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "source": ".",
   "required_mods": [],
   "native_api": "PZAPI/ModOptions",
@@ -11,41 +11,56 @@
     "yxjs_PinYinSearch 1.3",
     "ProximityInventory"
   ],
-  "frozen_candidate": "release/0.1.2_20261107_064627_publication-repair/SuQingSearchEnhancement-0.1.2-manual.zip",
-  "receipt": "release/0.1.2_20261107_064627_publication-repair/receipt.json",
+  "frozen_candidate": "release/0.1.3_20261108/SuQingSearchEnhancement-0.1.3-manual.zip",
+  "receipt": "release/0.1.3_20261108/release-manifest.json",
   "validation": "validation/result.json",
-  "state": "user-confirmed 0.1.2; offline validation passed; existing public Workshop item updated and natively verified; feature source pushed to GitHub main",
+  "development_candidate": {
+    "version": "0.1.3-rc.2",
+    "scope": "B42.21 single-player search performance and CleanUI stack toggle",
+    "status": "user-confirmed local candidate promoted without Lua changes",
+    "offline_validation": "validation/result.json",
+    "gameplay_acceptance": "user_confirmed",
+    "previous_candidate_feedback": {
+      "version": "0.1.3-rc.1",
+      "date": "2026-11-08",
+      "scope": "User's local B42.21 single-player save",
+      "result": "Reported search hitch no longer reproduced; list flickered while expanding a matching stack"
+    }
+  },
+  "state": "0.1.3 source promoted from user-confirmed 0.1.3-rc.2 with identical runtime Lua; release verification pending",
   "workshop": "0.1.2 uploaded and native-readback verified public; existing item/visibility preserved",
   "git": "Feature commit 25832d2 pushed to main at https://github.com/suching8848/suqing-search-enhancement",
   "gameplay_acceptance": {
     "status": "user_confirmed",
-    "tested_version": "0.1.2",
-    "reported_at": "2026-11-07T06:35:10.061568+08:00",
-    "source": "user message: 修复了可以更新git和创意工坊了",
-    "scope": "Current local B42.21 single-player setup; user confirms the search priority fix works",
+    "tested_version": "0.1.3-rc.2",
+    "release_version": "0.1.3",
+    "reported_on": "2026-11-08",
+    "recorded_at": "2026-11-08T16:22:10.875445+08:00",
+    "source": "User reported the original hitch was gone on rc.1 and confirmed normal behavior after the rc.2 stack fix, then authorized Git and Workshop updates.",
+    "scope": "Current local B42.21 single-player save and mod combination; original search hitch and matching stack expansion.",
     "not_claimed": [
       "complete English UI gameplay acceptance",
       "all third-party combinations",
       "controller gameplay acceptance",
       "multiplayer or dedicated server",
       "other game versions",
-      "measured performance gains"
+      "quantified in-game performance gains"
     ],
     "runtime_lua_sha256": {
       "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
-      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "ba3a03d3471d328346cbefe8866f0987c7c0c6bbe55642b3286295be134b5cc3",
-      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "6963e4663fc70abafe52fad9c6e196eeca8bd55074437d7afa76a94e4de7e0b5",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "ac274770642ef8ad8a5cbb5e714104c992bbfebf0935c8aca299a4cdb3dced91",
+      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "42b992fb923d4ed43701018f1db6579ce5c9afb84e3d329188d365ff30f26608",
+      "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "4f464eb395aa66e8e4d300e39354bf02961e9ba8afdf7a22d1292f19bb00db30",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "e1f42297f3e57f9c58870240c1f53d8ff4683b70a93221f40878d13ecfa2ca71",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "bbb5fd8c8d672f48a6b38185e241c9390c03a27d8987f16ecb5f014edcbaaa36",
       "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
-      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "a5ce931a87acc823a8addca34ef43beed6736638e540096b04e45240231f60a4",
+      "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "a1d238aa39224aac170b8d1df17b7f80b02a610472e934d78c209fdbccb34632",
       "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "26ae64769ca9ad3cd3cc38c7e88373d33c5d71d2c544c10b1290d634b6174b68"
     }
   },
   "publication_authorized": true,
-  "local_installed_version": "0.1.2",
-  "workshop_staging": "release/0.1.2_20261107_064627_publication-repair/workshop-upload/SuQingSearchEnhancement",
-  "release_manifest": "release/0.1.2_20261107_064627_publication-repair/release-manifest.json",
+  "local_installed_version": "0.1.3-rc.2",
+  "workshop_staging": "release/0.1.3_20261108/workshop-upload/SuQingSearchEnhancement",
+  "release_manifest": "release/0.1.3_20261108/release-manifest.json",
   "release_report": "publishing/发布记录_0.1.2.md",
   "cover_selection_pending": false,
   "cover_candidates": "art/cover-candidates_20261106/candidate-manifest.json",
@@ -94,17 +109,46 @@
         "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "0b3903734c1e223ae8d1e71b6e589077f70adf2088c1c416154f1ed530fc4d1c",
         "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae"
       }
+    },
+    {
+      "status": "user_confirmed",
+      "tested_version": "0.1.2",
+      "reported_at": "2026-11-07T06:35:10.061568+08:00",
+      "source": "user message: 修复了可以更新git和创意工坊了",
+      "scope": "Current local B42.21 single-player setup; user confirms the search priority fix works",
+      "not_claimed": [
+        "complete English UI gameplay acceptance",
+        "all third-party combinations",
+        "controller gameplay acceptance",
+        "multiplayer or dedicated server",
+        "other game versions",
+        "measured performance gains"
+      ],
+      "runtime_lua_sha256": {
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
+        "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "ba3a03d3471d328346cbefe8866f0987c7c0c6bbe55642b3286295be134b5cc3",
+        "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "a92fda110c4b7f81b81c632adbae777f87b257aa97b06f23ceb1b0b88f2306ae",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "6963e4663fc70abafe52fad9c6e196eeca8bd55074437d7afa76a94e4de7e0b5",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "ac274770642ef8ad8a5cbb5e714104c992bbfebf0935c8aca299a4cdb3dced91",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "a5ce931a87acc823a8addca34ef43beed6736638e540096b04e45240231f60a4",
+        "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "26ae64769ca9ad3cd3cc38c7e88373d33c5d71d2c544c10b1290d634b6174b68"
+      }
     }
   ],
   "candidate_publication": {
-    "version": "0.1.2",
-    "workshop_uploaded": true,
-    "native_readback_verified": true,
-    "git_committed": true,
-    "git_pushed": true,
-    "feature_commit": "25832d292f5e1de1d8e997e304a24f4662233131",
-    "workshop_visibility": 0,
-    "native_verification": "release/0.1.2_20261107_064627_publication-repair/native-verification.json"
+    "version": "0.1.3",
+    "workshop_uploaded": false,
+    "native_readback_verified": false,
+    "git_committed": false,
+    "git_pushed": false
   },
-  "uploaded_verified_public": true
+  "uploaded_verified_public": true,
+  "previous_verified_release_preparation": {
+    "frozen_candidate": "release/0.1.2_20261107_064627_publication-repair/SuQingSearchEnhancement-0.1.2-manual.zip",
+    "receipt": "release/0.1.2_20261107_064627_publication-repair/receipt.json",
+    "workshop_staging": "release/0.1.2_20261107_064627_publication-repair/workshop-upload/SuQingSearchEnhancement",
+    "release_manifest": "release/0.1.2_20261107_064627_publication-repair/release-manifest.json",
+    "release_report": "publishing/发布记录_0.1.2.md"
+  }
 }

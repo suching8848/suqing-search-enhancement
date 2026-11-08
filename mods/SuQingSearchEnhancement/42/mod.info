@@ -1,10 +1,10 @@
 name=SuQing's Search Enhancement
 id=SuQingSearchEnhancement
 author=SuQing
-modversion=0.1.2
+modversion=0.1.3
 versionMin=42.21
 versionMax=42.21
 icon=icon.png
 poster=poster.png
 loadModAfter=CleanUI,yxjs_PinYinSearch,PinyinSearch_SafeSources_4221_LocalFix,ProximityInventory,SuQingUIInteractionFixes,Codex_InventoryTransferPerformance_4221
-description=Search carried items and listed, accessible, explored nearby containers. Supports names, @mod, ASCII case-insensitive exact &Full.ID, whitespace AND, exclusions, OR and quoted groups. The sandbox handling mode defaults to all searches; special-only mode retains existing matching and yellow highlights for ordinary field input. The F8 panel always enhances searches. Enhanced matches have purple outlines and original yellow search highlights; selection/hover retain their backgrounds. Matching groups stay first across filter/sort refreshes; clearing restores native order. Priority resumes after dragging ends without another item click. Detailed lists are adapted; icon grids are not. Optional pinyin depends on an enabled upstream provider and dictionary. Eight personal Mod Options remain separate from the sandbox mode; context entry and click popup default off. No external hard prerequisite. The user confirmed the 0.1.2 search-priority fix in their current B42.21 single-player setup; other setups and multiplayer remain unverified.
+description=Search carried items and listed, accessible, explored nearby containers. Supports names, @mod, ASCII case-insensitive exact &Full.ID, whitespace AND, exclusions, OR and quoted groups. The sandbox handling mode defaults to all searches; special-only mode retains existing matching and yellow highlights for ordinary field input. The F8 panel always enhances searches. Enhanced matches have purple outlines and original yellow search highlights; selection/hover retain their backgrounds. Matching groups stay first across filter/sort refreshes; clearing restores native order. Priority resumes after dragging ends without another item click. Detailed lists are adapted; icon grids are not. Optional pinyin depends on an enabled upstream provider and dictionary. Eight personal Mod Options remain separate from the sandbox mode; context entry and click popup default off. No external hard prerequisite. Targets B42.21 single-player. Search scans run across frames and reuse text and pinyin results. Matching stacks stay first when expanded or collapsed in CleanUI.

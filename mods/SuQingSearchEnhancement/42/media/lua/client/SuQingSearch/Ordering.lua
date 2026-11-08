@@ -26,6 +26,14 @@ local function identity(value)
     return nil
 end
 
+local function captureAnchors(pane, saved)
+    local rows = pane.items
+    saved.anchor, saved.anchorGroup = identity(rows and rows[pane.firstSelect])
+    if rows and type(pane.joyselection) == "number" then
+        saved.joyAnchor, saved.joyGroup = identity(rows[pane.joyselection + 1])
+    end
+end
+
 local function snapshot(pane, selected)
     local saved = { inventory = pane.inventory, items = {}, groups = {}, raw = {},
         first = pane.firstSelect, joyIndex = pane.joyselection }
@@ -36,11 +44,7 @@ local function snapshot(pane, selected)
             if group then saved.groups[id] = true else saved.items[id] = true end
         end
     end
-    local anchor = pane.items and pane.items[pane.firstSelect]
-    saved.anchor, saved.anchorGroup = identity(anchor)
-    if type(pane.joyselection) == "number" and pane.items then
-        saved.joyAnchor, saved.joyGroup = identity(pane.items[pane.joyselection + 1])
-    end
+    captureAnchors(pane, saved)
     return saved
 end
 
@@ -77,14 +81,14 @@ local function restore(pane, selected, saved, actualRows)
     end
 end
 
-local function interacting(pane)
+local function interacting(pane, stackToggle)
     -- CleanUI retains dragStarted after releasing the item and only clears it
     -- on the next item click. Current drag state, not that historical flag,
     -- controls deferral so searching immediately after a transfer can sort.
     if pane.dragging ~= nil or pane.draggingMarquis then return true end
     if ISMouseDrag and ISMouseDrag.dragging ~= nil then return true end
     if isMouseButtonDown then
-        for button = 0, 2 do if isMouseButtonDown(button) then return true end end
+        for button = stackToggle and 1 or 0, 2 do if isMouseButtonDown(button) then return true end end
     end
     return false
 end
@@ -152,6 +156,103 @@ local function rememberPresentation(pane, record)
     end
 end
 
+local function rememberNative(pane, record, rebuilt, refresh)
+    record.native = nil
+    local integration = SQ.Integration
+    if not rebuilt or not integration or not integration.reviewedNativeSearch or not reviewedCleanUI()
+        or not integration.reviewedNativeSearch(pane, refresh) then return end
+    local rows = {}
+    for _, list in ipairs(presentationViews(pane)) do
+        local copy = {}
+        for index, row in ipairs(list) do copy[index] = row end
+        rows[list] = copy
+    end
+    record.native = {
+        rows = rows, search = pane.searchContainer, refresh = refresh,
+        text = pane.searchText, category = pane.searchCategoryText, mode = pane.searchMode,
+    }
+end
+
+local function reuseNative(pane, record)
+    local native = record.native
+    return native and native.search == pane.searchContainer and native.refresh == pane.refreshContainer
+        and native.text == pane.searchText and native.category == pane.searchCategoryText
+        and native.mode == pane.searchMode
+end
+
+local stackInputSources = {
+    { "CleanUI", "2.10.4", "isui/isinventorypane.lua" },
+    { "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua" },
+    { "Codex_InventoryTransferPerformance_4221", "1.2.2", "codex_inventorytransferperformance.lua" },
+}
+local observedInputs = {}
+
+local function normalizedPath(path)
+    if type(path) == "string" then return path:gsub("\\", "/"):gsub("^@", ""):lower() end
+end
+
+local function reviewedStackInput(fn)
+    if type(fn) ~= "function" or not getFilenameOfClosure or not getModInfoByID then return false end
+    local ok, reviewed = pcall(function()
+        local source = normalizedPath(getFilenameOfClosure(fn))
+        if not source then return false end
+        for _, entry in ipairs(stackInputSources) do
+            local id, version, file = entry[1], entry[2], entry[3]
+            local info = getModInfoByID(id) or getModInfoByID("\\" .. id)
+            if info and tostring(info:getModVersion()) == version then
+                local directory = normalizedPath(info:getVersionDir())
+                if directory and source == directory .. "/media/lua/client/" .. file then return true end
+            end
+        end
+        return false
+    end)
+    return ok and reviewed
+end
+
+local function observeStackInput(name)
+    local class = ISInventoryPane
+    local original = class and class[name]
+    if original == observedInputs[name] then return end
+    observedInputs[name] = original
+    if not reviewedStackInput(original) then return end
+    local wrapper
+    wrapper = function(pane, x, ...)
+        local record = panes[pane]
+        if not record then return original(pane, x, ...) end
+        local previous = record.stackToggle
+        record.stackToggle = nil
+        local inventory, list, generation = pane.inventory, pane.itemslist, pane.refreshContainerCount
+        local group = pane.items and pane.items[pane.mouseOverOption]
+        local sameView = (record.list == list and record.generation == generation)
+            or (previous and previous.list == list and previous.generation == generation)
+        if class[name] ~= wrapper or pane[name] ~= wrapper or not record.active or not record.ordered
+            or record.invalid or record.busy or record.inventory ~= inventory or record.sort ~= pane.itemSortFunc or not sameView
+            or not reuseNative(pane, record) or dirty(pane) or interacting(pane, true)
+            or type(generation) ~= "number" or type(x) ~= "number" or type(pane.column2) ~= "number"
+            or x >= pane.column2 or type(group) ~= "table" or group.type == "separator"
+            or not group.items or not group.name or not pane.collapsed then
+            return original(pane, x, ...)
+        end
+        local collapsed = pane.collapsed[group.name]
+        local toggle = previous or {}
+        -- Refresh can rewrite the anchor index for native order before the
+        -- renderer rebuilds its displayed row map.
+        if not previous then captureAnchors(pane, toggle) end
+        local a, b, c, d = original(pane, x, ...)
+        local nextGeneration = generation == 10000 and 0 or generation + 1
+        if pane.inventory == inventory and pane.itemslist ~= list and pane.refreshContainerCount == nextGeneration
+            and pane.collapsed[group.name] == not collapsed and not dirty(pane) and not interacting(pane, true) then
+            -- The input handled a stack header and already rebuilt the view.
+            -- The next normal draw can finish ordering without another rebuild.
+            toggle.list, toggle.generation = pane.itemslist, nextGeneration
+            record.stackToggle = toggle
+        end
+        return a, b, c, d
+    end
+    observedInputs[name] = wrapper
+    class[name] = wrapper
+end
+
 local function reviewedSelectionBridge(pane)
     local bridge = SuQingUIInteractionFixes and SuQingUIInteractionFixes.proximitySelection
     return bridge and bridge.version == "1.0.1" and bridge.installed == true and bridge.enabled == true
@@ -159,7 +260,7 @@ local function reviewedSelectionBridge(pane)
         and pane.inventory:getType() == "proxInv"
 end
 
-local function partition(list, state)
+local function partition(list, state, nativeRows)
     if type(list) ~= "table" then return false end
     local ordered, hits, misses = {}, {}, {}
     local removeKnownSeparator = reviewedCleanUI()
@@ -168,7 +269,7 @@ local function partition(list, state)
         for _, row in ipairs(misses) do ordered[#ordered + 1] = row end
         hits, misses = {}, {}
     end
-    for _, row in ipairs(list) do
+    for _, row in ipairs(nativeRows or list) do
         if row.type == "separator" then
             local known = removeKnownSeparator and row.name == "."
                 and type(row.items) == "table" and empty(row.items)
@@ -195,12 +296,18 @@ local function partition(list, state)
     return changed
 end
 
-local function partitionViews(pane, state)
+local function partitionViews(pane, state, native)
     local changed = false
     for _, list in ipairs(presentationViews(pane)) do
-        if partition(list, state) then changed = true end
+        if partition(list, state, native and native.rows[list]) then changed = true end
     end
     return changed
+end
+
+local function restoreNativeViews(native)
+    for list, rows in pairs(native.rows) do
+        for index = 1, math.max(#list, #rows) do list[index] = rows[index] end
+    end
 end
 
 local function settleRefreshedViews(pane)
@@ -238,7 +345,13 @@ end
 function M.render(pane, state, doDragged, original, ...)
     if doDragged ~= false then return original(pane, doDragged, ...) end
     local record = panes[pane]
-    if (record and record.busy) or interacting(pane) then return original(pane, doDragged, ...) end
+    if record and record.busy then return original(pane, doDragged, ...) end
+    local pending = record and record.stackToggle
+    if pending then
+        record.stackToggle = nil
+    elseif interacting(pane) then
+        return original(pane, doDragged, ...)
+    end
     local selected = pane.selected or {}
     if getmetatable(selected) ~= nil then return original(pane, doDragged, ...) end
 
@@ -246,15 +359,23 @@ function M.render(pane, state, doDragged, original, ...)
     local enabled = not SQ.getOptions or SQ.getOptions().sortMatches ~= false
     local active = enabled and state and state.ready == true and compiled
         and compiled.active == true and not compiled.errorKey
+    local stackToggle = active and pending and record.active and not record.invalid
+        and record.revision == state.revision and record.inventory == pane.inventory
+        and record.sort == pane.itemSortFunc
+        and record.query == (state.query or "") and record.category == (state.category or "")
+        and pending.list == pane.itemslist and pending.generation == pane.refreshContainerCount
+        and reuseNative(pane, record) and not dirty(pane)
+    if pending and interacting(pane, stackToggle) then return original(pane, doDragged, ...) end
     local restoreNative = record and record.ordered and not active
     if not active and not restoreNative then
         if record then record.active = false end
         return original(pane, doDragged, ...)
     end
-    local cached = active and record and not record.invalid and record.active
-        and record.revision == state.revision and record.inventory == pane.inventory
+    local sameView = record and not record.invalid and record.inventory == pane.inventory
         and record.list == pane.itemslist and record.generation == pane.refreshContainerCount
         and record.sort == pane.itemSortFunc and not dirty(pane) and samePresentation(pane, record)
+    local cached = active and sameView and record.active and record.revision == state.revision
+    local reuse = not cached and sameView and reuseNative(pane, record)
 
     record = record or {}
     panes[pane] = record
@@ -263,16 +384,24 @@ function M.render(pane, state, doDragged, original, ...)
     record.invalid = true
     local inventory = pane.inventory
     local saved = not cached and snapshot(pane, selected) or nil
-    local useBridge = reviewedSelectionBridge(pane)
+    if stackToggle then
+        saved.anchor, saved.anchorGroup = pending.anchor, pending.anchorGroup
+        saved.joyAnchor, saved.joyGroup = pending.joyAnchor, pending.joyGroup
+    end
+    -- The Proximity bridge remaps after a native refresh generation changes.
+    -- Reused rows and stack clicks need our own semantic anchor for the draw.
+    local useBridge = not reuse and not stackToggle and reviewedSelectionBridge(pane)
     record.busy = true
     local ok, reason = true, nil
-    if not cached then
-        ok, reason = pcall(finalise, pane)
+    if not cached and not reuse then
+        local generation = pane.refreshContainerCount
+        ok, reason = pcall(stackToggle and settleRefreshedViews or finalise, pane)
         if not ok then
             record.busy = false
             if pane.inventory == inventory and pane.selected == selected then restore(pane, selected, saved, false) end
             error(reason, 0)
         end
+        rememberNative(pane, record, stackToggle or pane.refreshContainerCount ~= generation, pane.refreshContainer)
     end
     if pane.inventory ~= inventory then
         panes[pane] = nil
@@ -281,13 +410,16 @@ function M.render(pane, state, doDragged, original, ...)
 
     local changed = false
     if active and not cached then
-        ok, changed = pcall(partitionViews, pane, state)
+        ok, changed = pcall(partitionViews, pane, state, reuse and record.native)
         if not ok then
             record.busy = false
             if pane.selected == selected then restore(pane, selected, saved, false) end
             error(changed, 0)
         end
+    elseif restoreNative and reuse then
+        restoreNativeViews(record.native)
     end
+    if not cached and record.native then rememberPresentation(pane, record) end
     -- If drawing fails after the list changed, a later clear must still restore
     -- native order rather than treating this pane as never having been sorted.
     if active and changed then record.ordered = true end
@@ -316,13 +448,18 @@ function M.render(pane, state, doDragged, original, ...)
     if active and type(nativeRefresh) == "function" then
         rawset(pane, "refreshContainer", function(self, ...)
             if self == pane and pane.inventory == inventory then prepareSelection() end
+            local generation = pane.refreshContainerCount
             local r1, r2, r3, r4 = nativeRefresh(self, ...)
             if self == pane and pane.inventory == inventory then
                 refreshed = true
                 settleRefreshedViews(pane)
+                -- Capture only the last completed native rebuild, before
+                -- enhanced rows change their order again.
+                rememberNative(pane, record, pane.refreshContainerCount ~= generation, nativeRefresh)
                 if partitionViews(pane, state) then
                     changed, record.ordered = true, true
                 end
+                if record.native then rememberPresentation(pane, record) end
             end
             return r1, r2, r3, r4
         end)
@@ -345,7 +482,16 @@ function M.render(pane, state, doDragged, original, ...)
     record.query, record.category = state and state.query or "", state and state.category or ""
     record.inventory, record.list, record.generation, record.sort = pane.inventory,
         pane.itemslist, pane.refreshContainerCount, pane.itemSortFunc
-    if not cached or refreshed then rememberPresentation(pane, record) end
+    if not cached or refreshed then
+        -- A renderer may replace or reorder a view after we sorted it.
+        -- In that case the captured native order must not be reused.
+        if record.native and not samePresentation(pane, record) then record.native = nil end
+        if not record.native then rememberPresentation(pane, record) end
+    end
+    if active and not cached and record.native then
+        observeStackInput("onMouseDown")
+        observeStackInput("onMouseDoubleClick")
+    end
     return a, b, c, d
 end
 

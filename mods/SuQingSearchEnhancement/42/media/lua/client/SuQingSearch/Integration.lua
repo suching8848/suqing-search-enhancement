@@ -15,6 +15,7 @@ local installedClasses = setmetatable({}, { __mode = "k" })
 local boundFields = setmetatable({}, { __mode = "k" })
 local nativeChanges = setmetatable({}, { __mode = "k" })
 local syncedPanels = setmetatable({}, { __mode = "k" })
+local nativeFilters = setmetatable({}, { __mode = "k" })
 local SOURCE = "cleanui"
 local replayingOptions = false
 
@@ -90,7 +91,76 @@ local function ownSlot(object, name)
     end
 end
 
+local function normalizedPath(path)
+    if type(path) == "string" then return path:gsub("\\", "/"):gsub("^@", ""):lower() end
+end
+
+local cleanPane = "isui/isinventorypane.lua"
+local pinyinID = "PinyinSearch_SafeSources_4221_LocalFix"
+local pinyinFile = "pinyinsafecompat.lua"
+local function reviewedSource(fn, id, version, file)
+    if type(fn) ~= "function" or not getFilenameOfClosure or not getModInfoByID then return false end
+    local ok, matches = pcall(function()
+        local info = getModInfoByID(id) or getModInfoByID("\\" .. id)
+        if not info or tostring(info:getModVersion()) ~= version then return false end
+        local directory = normalizedPath(info:getVersionDir())
+        return directory ~= nil and normalizedPath(getFilenameOfClosure(fn)) == directory .. "/media/lua/client/" .. file
+    end)
+    return ok and matches == true
+end
+
+function M.reviewedNativeSearch(pane, refresh)
+    local search = pane.searchContainer
+    refresh = refresh or pane.refreshContainer
+    return (reviewedSource(search, "CleanUI", "2.10.4", cleanPane)
+            or reviewedSource(search, pinyinID, "1.1", pinyinFile))
+        and (reviewedSource(refresh, "CleanUI", "2.10.4", cleanPane)
+            or reviewedSource(refresh, pinyinID, "1.1", pinyinFile)
+            or reviewedSource(refresh, "NeatUI_Equipment", "1.0.2", "neatequipment/patches/neq_hideequipped.lua")
+            or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.2", "codex_inventorytransferperformance.lua")
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua"))
+end
+
 local function withCategoryOnly(handler, original, category, ...)
+    local _, _, window = contextFor(handler)
+    local pane = window and window.inventoryPane
+    if pane and M.reviewedNativeSearch(pane)
+        and reviewedSource(original, "CleanUI", "2.10.4", "isui/commonhandler/inventorysearch.lua") then
+        -- Let CleanUI read the actual field for clear-button visibility. Only
+        -- the name sent to its inventory search is owned by our matcher.
+        local previous = ownSlot(pane, "searchContainer")
+        local search, refresh = pane.searchContainer, pane.refreshContainer
+        rawset(pane, "searchContainer", function(self, _name, nativeCategory, mode)
+            local cached = nativeFilters[handler]
+            local inventory = pane.inventory
+            if not replayingOptions and cached and cached.pane == pane and cached.inventory == inventory
+                and cached.search == search and cached.refresh == refresh
+                and cached.list == pane.itemslist and cached.generation == pane.refreshContainerCount
+                and cached.sort == pane.itemSortFunc
+                and cached.category == nativeCategory and cached.mode == mode
+                and (pane.searchText == nil or pane.searchText == "") and pane.searchMode == mode
+                and cached.appliedCategory == pane.searchCategoryText
+                and inventory and inventory.isDrawDirty and not inventory:isDrawDirty() then
+                return
+            end
+            nativeFilters[handler] = nil
+            local result = search(self, "", nativeCategory, mode)
+            nativeFilters[handler] = {
+                pane = pane, inventory = inventory, search = search, refresh = refresh,
+                list = pane.itemslist, generation = pane.refreshContainerCount, sort = pane.itemSortFunc,
+                category = nativeCategory, mode = mode, appliedCategory = pane.searchCategoryText,
+            }
+            return result
+        end)
+        local ok, result = pcall(original, handler, ...)
+        rawset(pane, "searchContainer", previous)
+        if not ok then
+            nativeFilters[handler] = nil
+            error(result, 0)
+        end
+        return result
+    end
+    nativeFilters[handler] = nil
     -- Shadow this instance only, preserving both inherited methods and unusual
     -- instance overrides. Always restore the exact previous slot on an error.
     local previous = ownSlot(handler, "getSearchTexts")
@@ -152,6 +222,7 @@ function M.install()
         -- authority. Disabling integration only detaches the two interfaces.
         clearOwnedQuery(self, enabled and syncedPanels[self] == true)
         syncedPanels[self] = nil
+        nativeFilters[self] = nil
         local result = originalChange(self, ...)
         notifyPanel(self, name, category)
         return result
@@ -162,6 +233,7 @@ function M.install()
             -- pane:searchContainer directly. It still needs to clear our owner.
             clearOwnedQuery(self, options().integrate ~= false)
             syncedPanels[self] = nil
+            nativeFilters[self] = nil
             local result = originalClear(self, ...)
             notifyPanel(self, "", "")
             return result
@@ -228,14 +300,6 @@ function M.refreshOptions()
     if not ok then error(result, 0) end
 end
 
-local function markDirty()
-    if SQ.markDirty then SQ.markDirty() end
-end
-M.onContainerUpdate = markDirty
-function M.onContainerRefresh(_page, stage)
-    if stage == "end" then markDirty() end
-end
-
 local installPending = false
 local function installOnTick()
     if Events and Events.OnTick then Events.OnTick.Remove(installOnTick) end
@@ -252,10 +316,4 @@ function M.scheduleInstall()
     end
 end
 
-if Events then
-    if Events.OnGameStart then Events.OnGameStart.Add(M.scheduleInstall) end
-    if Events.OnContainerUpdate then Events.OnContainerUpdate.Add(M.onContainerUpdate) end
-    if Events.OnRefreshInventoryWindowContainers then
-        Events.OnRefreshInventoryWindowContainers.Add(M.onContainerRefresh)
-    end
-end
+if Events and Events.OnGameStart then Events.OnGameStart.Add(M.scheduleInstall) end

@@ -50,7 +50,7 @@ equal(results.matches[unseenItem], nil, "unexplored item rejected")
 equal(results.matches[lockedItem], nil, "locked container rejected")
 equal(results.matches[parentItem], nil, "locked parent rejected")
 equal(results.matches[virtualOnly], nil, "virtual-only item not revealed")
-equal(chest.reads, 1, "duplicate button does not rescan physical container")
+equal(chest.reads, 2, "duplicate button shares one snapshot and one validation")
 equal(unexplored.reads, 0, "unexplored item list never read")
 equal(locked.reads, 0, "locked item list never read")
 equal(lockedParent.reads, 0, "locked parent item list never read")
@@ -196,14 +196,18 @@ equal(SQ.rendererInstalled, true, "renderer deferred until first tick after game
 results = query(page, '@"Modern Firearms System" m110')
 equal(results.total, 2, "active mod display name registry used")
 local pane = page.inventoryPane
-pane.items = { { items = { rifle, floorItem, concealed } } }
+pane.items = {
+    { items = { rifle, floorItem } },
+    { items = { rifle, floorItem, concealed } },
+    rifle,
+}
 pane.calls = {}
 local renderResult = ISInventoryPane.renderdetails(pane, false)
 equal(renderResult, "native-render-result", "renderer preserves native return value")
 equal(pane.nativeRenderCalls, 1, "native row renderer called once")
-local foundFraction = false
-for _, call in ipairs(pane.calls) do if call.kind == "text" and call.label == "2/3" then foundFraction = true end end
-equal(foundFraction, true, "mixed row displays actual matching fraction")
+local labels = textDraws(pane)
+equal(#labels, 1, "only the partially matching stack draws a count")
+equal(labels[1], "2/3", "mixed row displays actual matching fraction")
 pane.calls = {}
 ISInventoryPane.renderdetails(pane, true)
 equal(#pane.calls, 0, "dragging never draws search overlays")
@@ -262,6 +266,11 @@ for _, call in ipairs(pane.calls) do
         equal(call.args[2] >= pane.headerHgt, true, "search overlays never cover the header")
     end
 end
+pane.items[1].matchesSearch = true
+pane.calls = {}
+SQ.drawMatches(pane, false)
+equal(yellow(), 0, "visible children inherit yellow from a clipped native group")
+equal(purple(), 2, "only the visible matching children receive borders")
 pane.yScroll, pane.calls = 0, {}
 results.ready = false
 SQ.drawMatches(pane, false)
@@ -339,4 +348,77 @@ equal(replays, 1, "unchanged sandbox mode does not repeatedly replay fields")
 M.options.searchHandling = "all"
 SQ.tick()
 equal(replays, 2, "switching back to all replays fields immediately")
+
+case()
+local many = {}
+for index = 1, 240 do many[index] = M.item("Bolt", "Base.Bolt") end
+local manyContainer = M.container("crate", many, true)
+local manyVirtual = M.container("proxInv", many, true)
+local manyPage = M.page(false, {manyContainer, manyVirtual})
+M.loot[0] = manyPage
+SQ.registerPage(manyPage)
+SQ.setQuery(0, "bolt", "nearby")
+M.advance(120)
+local manyState = state(manyPage)
+equal(manyState.ready, false, "a large query yields after its first slice")
+equal(manyState.total, 0, "partial matches never publish")
+local replaced = many[1]
+many[1] = M.item("Washer", "Base.Washer")
+for _ = 1, 5 do M.advance(16) end
+equal(manyState.ready, false, "same-size replacement invalidates the completed snapshot")
+equal(manyState.matches[replaced], nil, "replaced item never publishes")
+for _ = 1, 10 do
+    M.emit("OnContainerUpdate")
+    M.advance(16)
+end
+equal(manyState.ready, true, "event bursts cannot restart a valid running scan")
+equal(manyState.total, 239, "retry publishes the current physical items")
+equal(manyState.counts[manyVirtual], 239, "virtual scan follows the current physical snapshot")
+
+manyContainer.locked = true
+M.emit("OnRefreshInventoryWindowContainers", manyPage, "end")
+equal(manyState.total, 0, "source losing access immediately clears its old hits")
+M.advance(120)
+equal(manyState.total, 0, "virtual membership does not reveal locked sources")
+manyContainer.locked = false
+SQ.setQuery(0, "bolt washer", "nearby")
+M.advance(120)
+SQ.setQuery(0, "washer", "nearby")
+M.advance(120)
+for _ = 1, 5 do M.advance(16) end
+equal(manyState.total, 1, "a new query cancels the old scan")
+equal(manyState.matches[many[1]], true, "only the new expression publishes")
+
+case()
+local ownMany = M.page(true, {M.container("bag", many, true)})
+M.inventories[0] = ownMany
+SQ.registerPage(ownMany)
+SQ.setQuery(0, "bolt", "inventory")
+SQ.setQuery(0, "bolt", "nearby")
+M.advance(120)
+M.advance(16)
+equal(state(manyPage).scan ~= nil, true, "nearby gets a slice with both searches active")
+equal(state(ownMany).scan ~= nil, true, "inventory also gets a slice with both searches active")
+manyPage.visible = false
+M.advance(16)
+equal(manyState.scan, nil, "hidden pages discard unfinished work")
+equal(manyState.ready, false, "hidden page cannot publish results")
+
+case()
+local transferred = M.item("Bolt", "Base.Bolt")
+local sender = M.container("crate", {transferred}, true)
+local receiver = M.container("crate", {}, true)
+local transferPage = M.page(false, {sender, receiver})
+M.loot[0] = transferPage
+SQ.registerPage(transferPage)
+SQ.refreshPage(transferPage)
+local transferState = state(transferPage)
+local beforeTransfer = transferState.revision
+sender.list.values = {}
+receiver.list.values = {transferred}
+SQ.refreshPage(transferPage)
+equal(transferState.counts[sender], 0, "transfer removes hit from the old container")
+equal(transferState.counts[receiver], 1, "transfer updates the new container badge")
+equal(transferState.revision, beforeTransfer, "unchanged match set does not request another sort")
+
 return "SQSEARCH_RUNTIME cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

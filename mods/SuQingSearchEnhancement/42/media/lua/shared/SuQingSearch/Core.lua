@@ -143,6 +143,13 @@ end
 local function humanText(text, value, options)
     text = tostring(text or "")
     if text == "" then return false end
+    -- The scan matcher includes the same literal check. Let it reuse the full
+    -- result across instances and category labels before doing any text work.
+    if type(options.scanTextMatcher) == "function" then
+        local ok, answer = pcall(options.scanTextMatcher, text, value)
+        if ok then return answer == true end
+        return contains(text, value)
+    end
     if contains(text, value) then return true end
     -- The new shared matcher owns optional pinyin and separator tolerance.
     -- Retain the old callback contract only when no shared matcher is supplied.

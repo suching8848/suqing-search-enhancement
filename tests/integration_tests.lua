@@ -26,7 +26,7 @@ Events = {
 }
 isServer = function() return false end
 local settings = { integrate = true, clickPopup = false }
-local active, opened, dirty, queryWrites = {}, {}, 0, 0
+local active, opened, queryWrites = {}, {}, 0
 local notifications = {}
 local function key(player, scope) return tostring(player) .. ":" .. scope end
 SuQingSearch = {
@@ -47,7 +47,6 @@ SuQingSearch = {
     panelQueryChanged = function(player, scope, text, category)
         notifications[#notifications + 1] = { player, scope, text, category }
     end,
-    markDirty = function() dirty = dirty + 1 end,
 }
 local H = {}
 function H:getWindow() return self.inventoryWindow or self.lootWindow end
@@ -62,8 +61,16 @@ function H:onSearchTextChange()
     local name, category = self:getSearchTexts()
     self.native = { name, category, self:getSearchMode() }
     self.calls = (self.calls or 0) + 1
+    local window = self:getWindow()
+    local pane = window and window.inventoryPane
+    if pane and pane.searchContainer then
+        pane:searchContainer(name, category, self:getSearchMode())
+        local fieldName, fieldCategory = self:getSearchTexts()
+        self.clearVisible = (fieldName or "") ~= "" or (fieldCategory or "") ~= ""
+    end
     return "native-result"
 end
+local nativeHandler = H.onSearchTextChange
 function H:clearSearch()
     self.text = ""
     self.category = ""
@@ -299,12 +306,6 @@ equal(inv.suppressSearchUpdate, true, "textbox error restores prior suppress fla
 inv.searchField.setText = originalSetText
 inv.suppressSearchUpdate = nil
 
-M.onContainerRefresh({}, "begin")
-equal(dirty, 0, "intermediate refresh not scanned")
-M.onContainerRefresh({}, "end")
-M.onContainerUpdate({})
-equal(dirty, 2, "completed refresh and content update mark dirty")
-
 for _, value in ipairs({ "@Brita", "&Base.Axe", "-broken", "axe saw", '"red pen"', "axe|saw", "axe |", "axe\\|saw", "axe\\ saw", "hammer", "  hammer  ", "mod-item", "foo@bar", "foo&bar", "\\@literal", "NRB", "M110Rifle" }) do
     equal(M.isSearchQuery(value), true, "shared query routing " .. value)
 end
@@ -365,6 +366,90 @@ direct.fail = true
 equal(pcall(H.onSearchTextChange, direct), false, "PZ-style inherited callback errors surface")
 equal(ownSlot(direct, "getSearchTexts"), nil, "PZ-style inheritance restores exact slot on error")
 H.__index = nil
+
+-- Reviewed CleanUI's text callback must still see the real field and update
+-- controls. Only its identical native inventory-search operation is skipped.
+local cleanDir = "D:/fixtures/CleanUI/42.19"
+local refresh = function(self)
+    self.refreshContainerCount = self.refreshContainerCount + 1
+    self.itemslist = {}
+    self.inventory.dirty = false
+end
+local search = function(self, name, category, mode)
+    self.searchText = name ~= "" and name or nil
+    self.searchCategoryText = category ~= "" and category:lower() or nil
+    self.searchMode = mode
+    self:refreshContainer()
+end
+local sources = {
+    [nativeHandler] = cleanDir .. "/media/lua/client/ISUI/CommonHandler/InventorySearch.lua",
+    [refresh] = cleanDir .. "/media/lua/client/ISUI/ISInventoryPane.lua",
+    [search] = cleanDir .. "/media/lua/client/ISUI/ISInventoryPane.lua",
+}
+getFilenameOfClosure = function(fn) return sources[fn] end
+getModInfoByID = function(id)
+    if id == "CleanUI" then
+        return {
+            getModVersion = function() return "2.10.4" end,
+            getVersionDir = function() return cleanDir end,
+        }
+    end
+end
+local function newPane()
+    return {
+        inventory = { isDrawDirty = function(self) return self.dirty == true end },
+        refreshContainerCount = 0, searchContainer = search, refreshContainer = refresh,
+    }
+end
+local fast = handler("inventory", 3)
+local pane = newPane()
+fast.inventoryWindow.inventoryPane = pane
+fast.text = "h"
+equal(fast:onSearchTextChange(), "native-result", "reviewed handler preserves native callback return")
+equal(pane.searchText, nil, "reviewed native name filter is empty")
+equal(pane.refreshContainerCount, 1, "first takeover rebuilds native rows once")
+equal(fast.clearVisible, true, "clear button sees actual enhanced input on first takeover")
+fast.searchField:setText("ha")
+fast.searchField:setText("ham")
+equal(pane.refreshContainerCount, 1, "adjacent edits reuse identical empty native filter")
+equal(fast.calls, 3, "native handler still runs for each name edit")
+equal(fast.clearVisible, true, "cached native filter preserves clear control")
+equal(active["3:inventory"].text, "ham", "cached native filter does not skip enhancement query")
+fast.mode, fast.category = "both", "Weapon"
+fast.searchField:setText("hamm")
+equal(pane.refreshContainerCount, 2, "native mode and category transition force a rebuild")
+equal(pane.searchCategoryText, "weapon", "applied category remains CleanUI-normalized")
+fast.searchField:setText("hammer")
+equal(pane.refreshContainerCount, 2, "name edits preserve an unchanged combined category")
+fast.categorySearchField:setText("Food")
+equal(pane.refreshContainerCount, 3, "category edit rebuilds despite unchanged name")
+pane.inventory.dirty = true
+fast.searchField:setText("ham")
+equal(pane.refreshContainerCount, 4, "dirty inventory forces native rebuild")
+pane.itemslist = {}
+fast.searchField:setText("ha")
+equal(pane.refreshContainerCount, 5, "replaced list forces native rebuild")
+pane.inventory = { isDrawDirty = function() return false end }
+fast.searchField:setText("h")
+equal(pane.refreshContainerCount, 6, "changed container forces native rebuild")
+pane = newPane()
+fast.inventoryWindow.inventoryPane = pane
+fast.searchField:setText("ha")
+equal(pane.refreshContainerCount, 1, "changed pane cannot reuse previous filter")
+local unknownRefresh = function(self) refresh(self) end
+pane.refreshContainer = unknownRefresh
+fast.searchField:setText("ham")
+fast.searchField:setText("hamm")
+equal(pane.refreshContainerCount, 3, "unreviewed refresh wrapper always executes")
+pane.refreshContainer = refresh
+fast.searchField:setText("")
+equal(fast.clearVisible, true, "native category remains in clear controls after clearing the name")
+fast.searchField:setText("ham")
+equal(pane.refreshContainerCount, 5, "clearing enhanced ownership invalidates cached filter")
+fast.fail = true
+equal(pcall(H.onSearchTextChange, fast), false, "reviewed handler errors surface")
+equal(ownSlot(pane, "searchContainer"), search, "reviewed handler restores exact search slot on error")
+fast.fail = false
 
 local previous = H.onSearchTextChange
 dofile("mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua")

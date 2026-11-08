@@ -5,12 +5,23 @@ function M.list(values)
     local object = { values = values or {} }
     function object:size() return #self.values end
     function object:get(index) return self.values[index + 1] end
+    function object:addAll(other)
+        for _, value in ipairs(other.values) do self.values[#self.values + 1] = value end
+    end
+    function object:equals(other)
+        if self:size() ~= other:size() then return false end
+        for index, value in ipairs(self.values) do
+            if value ~= other.values[index] then return false end
+        end
+        return true
+    end
     function object:contains(value)
         for _, candidate in ipairs(self.values) do if candidate == value then return true end end
         return false
     end
     return object
 end
+ArrayList = { new = M.list }
 M.mods = M.list({ "ModernFirearmsSystem" })
 function getTimestampMs() return M.time end
 function getText(key)

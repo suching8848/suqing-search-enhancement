@@ -9,9 +9,11 @@ local Core = SQ.Core
 SQ.states = SQ.states or {}
 SQ.pages = SQ.pages or setmetatable({}, {__mode = "k"})
 local modNames = {}
-local pinyinEnabled = false
-local dueAt = 0
-local lastRefresh = 0
+local REFRESH_DELAY_MS = 120
+local AUDIT_INTERVAL_MS = 1000
+local SLICE_BUDGET_MS = 2
+local SLICE_MAX_STEPS = 96
+local nextPage = 1
 local searchHandling
 
 local function now()
@@ -28,25 +30,45 @@ function SQ.getState(playerNum, scope)
     return states[scope]
 end
 
+local function active(state)
+    return state.compiled.active and not state.compiled.errorKey
+end
+
+local function markStateDirty(state, dueAt)
+    -- A running scan can finish. A burst of events requests just one follow-up.
+    if active(state) and not state.dueAt then state.dueAt = dueAt end
+end
+
 function SQ.markDirty()
-    -- Coalesce game/UI events without postponing a pending refresh indefinitely.
-    if dueAt == 0 then dueAt = now() + 120 end
+    local dueAt = now() + REFRESH_DELAY_MS
+    for _, states in pairs(SQ.states) do
+        for _, state in pairs(states) do markStateDirty(state, dueAt) end
+    end
+end
+
+local function clearResults(state)
+    state.ready, state.sources = false, nil
+    state.matches, state.counts, state.total = {}, {}, 0
+end
+
+local function invalidateResults(state)
+    if state.ready then
+        clearResults(state)
+        state.revision = state.revision + 1
+    end
 end
 
 function SQ.setQuery(playerNum, text, scope, category, source)
     local state = SQ.getState(playerNum, scope)
-    text = text or ""
-    category = category or ""
+    text, category, source = text or "", category or "", source or "panel"
     if state.query == text and state.category == category and state.source == source then return end
-    state.query = text
-    state.category = category
-    state.source = source or "panel"
+    state.query, state.category, state.source = text, category, source
     state.compiled = Core.compile(text)
     state.revision = state.revision + 1
-    state.ready = false
-    -- Never retain previous hits while the user is entering a different expression.
-    state.matches, state.counts, state.total = {}, {}, 0
-    SQ.markDirty()
+    state.scan, state.dueAt, state.auditAt = nil, nil, nil
+    state.matchText = nil
+    clearResults(state)
+    markStateDirty(state, now() + REFRESH_DELAY_MS)
 end
 
 function SQ.clearQuery(playerNum, scope, source)
@@ -55,18 +77,15 @@ function SQ.clearQuery(playerNum, scope, source)
     state.query, state.category, state.source = "", "", nil
     state.compiled = Core.compile("")
     state.revision = state.revision + 1
-    state.ready = false
-    state.matches, state.counts, state.total = {}, {}, 0
+    state.scan, state.dueAt, state.auditAt = nil, nil, nil
+    state.matchText = nil
+    clearResults(state)
 end
 
-local function textMatches(text, term)
-    return SQ.Text.matches(text, term, pinyinEnabled)
-end
-
-local function categoryMatches(item, query)
+local function categoryMatches(item, query, matchText)
     if not query or query == "" then return true end
     for _, category in ipairs({item:getDisplayCategory() or "", item:getCategory() or ""}) do
-        if textMatches(category, query) or textMatches(getText("IGUI_ItemCat_" .. category), query) then
+        if matchText(category, query) or matchText(getText("IGUI_ItemCat_" .. category), query) then
             return true
         end
     end
@@ -85,68 +104,125 @@ local function readable(container, page)
 end
 SQ.isReadableContainer = readable
 
-function SQ.refreshPage(page)
-    if not page.inventoryPane then return end
-    local scope = page.onCharacter and "inventory" or "nearby"
-    local state = SQ.getState(page.player, scope)
-    local previousMatches, previousTotal, previousReady = state.matches, state.total, state.ready
-    state.matches, state.counts, state.total = {}, {}, 0
-    if not state.compiled.active or state.compiled.errorKey then
-        state.ready = false
-        return
+local function getSources(page)
+    local physical, virtual, seen = {}, {}, {}
+    for _, button in ipairs(page.backpacks or {}) do
+        local container = button.inventory
+        if container and not seen[container] then
+            seen[container] = true
+            local kind = container:getType()
+            if kind == "proxInv" or kind == "local" then
+                virtual[#virtual + 1] = container
+            elseif readable(container, page) then
+                physical[#physical + 1] = container
+            end
+        end
     end
-    pinyinEnabled = SQ.getOptions().pinyin == true
+    physical.physicalCount = #physical
+    for _, container in ipairs(virtual) do physical[#physical + 1] = container end
+    return physical
+end
+
+local function sameSources(a, b)
+    if not a or #a ~= #b or a.physicalCount ~= b.physicalCount then return false end
+    for i = 1, #a do
+        if a[i] ~= b[i] then return false end
+    end
+    return true
+end
+
+local function newScan(page, sources, state)
+    local pinyin = SQ.getOptions().pinyin == true
+    if not state.matchText or state.matcherPinyin ~= pinyin then
+        state.matchText, state.matcherPinyin = SQ.Text.newMatcher(pinyin), pinyin
+    end
     local options = {
         modNames = modNames,
         vanillaNames = {"vanilla", "\229\142\159\231\137\136", getText("UI_SQSearch_Vanilla")},
         unknownNames = {"unknown", "\230\156\170\231\159\165", getText("UI_SQSearch_Unknown")},
-        textMatcher = textMatches,
+        scanTextMatcher = state.matchText,
     }
-    local seenContainers, seenItems = {}, {}
-    for _, button in ipairs(page.backpacks or {}) do
-        local container = button.inventory
-        if not seenContainers[container] and readable(container, page) then
-            seenContainers[container] = true
-            local items = container:getItems()
-            local count = 0
-            for i = 0, items:size() - 1 do
-                local item = items:get(i)
-                if not seenItems[item] then
-                    seenItems[item] = true
-                    if not item:isHidden() and Core.matches(item, state.compiled, options)
-                        and categoryMatches(item, state.category) then
-                        state.matches[item] = true
-                        state.total = state.total + 1
-                        count = count + 1
-                    end
+    return {
+        page = page, sources = sources, pinyin = pinyin, options = options,
+        snapshots = {}, sourceIndex = 1, matches = {}, counts = {}, seenItems = {}, total = 0,
+    }
+end
+
+local function advanceScan(scan, state, work)
+    while scan.sourceIndex <= #scan.sources and work.steps > 0 and now() < work.deadline do
+        work.steps = work.steps - 1
+        local container = scan.sources[scan.sourceIndex]
+        if not scan.items then
+            -- Copy references in Java. The live list can change while the scan yields.
+            local snapshot = ArrayList.new()
+            snapshot:addAll(container:getItems())
+            scan.items, scan.itemIndex, scan.itemCount = snapshot, 0, snapshot:size()
+            scan.snapshots[scan.sourceIndex] = snapshot
+            scan.counts[container] = 0
+            scan.virtualSeen = scan.sourceIndex > scan.sources.physicalCount and {} or nil
+        elseif scan.itemIndex >= scan.itemCount then
+            scan.sourceIndex = scan.sourceIndex + 1
+            scan.items = nil
+        else
+            local item = scan.items:get(scan.itemIndex)
+            scan.itemIndex = scan.itemIndex + 1
+            if scan.virtualSeen then
+                -- Virtual tabs only project already-counted physical instances.
+                if scan.matches[item] and not scan.virtualSeen[item] then
+                    scan.virtualSeen[item] = true
+                    scan.counts[container] = scan.counts[container] + 1
+                end
+            elseif not scan.seenItems[item] then
+                scan.seenItems[item] = true
+                if not item:isHidden() and Core.matches(item, state.compiled, scan.options)
+                    and categoryMatches(item, state.category, scan.options.scanTextMatcher) then
+                    scan.matches[item] = true
+                    scan.total = scan.total + 1
+                    scan.counts[container] = scan.counts[container] + 1
+                    if not state.matches[item] then scan.changed = true end
                 end
             end
-            state.counts[container] = count
         end
     end
-    -- Virtual aggregation tabs project already-counted instances, including only
-    -- items present in a readable physical source. They add nothing to the total.
-    for _, button in ipairs(page.backpacks or {}) do
-        local container = button.inventory
-        if container and (container:getType() == "proxInv" or container:getType() == "local") then
-            local items, unique, count = container:getItems(), {}, 0
-            for i = 0, items:size() - 1 do
-                local item = items:get(i)
-                if state.matches[item] and not unique[item] then
-                    unique[item], count = true, count + 1
-                end
-            end
-            state.counts[container] = count
+    return scan.sourceIndex > #scan.sources
+end
+
+function SQ.refreshPage(page, work)
+    if not page.inventoryPane then return end
+    local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
+    if not active(state) then return end
+    work = work or {steps = SLICE_MAX_STEPS, deadline = now() + SLICE_BUDGET_MS}
+    if not state.scan or state.scan.page ~= page then
+        local sources = getSources(page)
+        if state.page ~= page or not sameSources(state.sources, sources) then
+            invalidateResults(state)
+        end
+        state.page, state.dueAt = page, nil
+        state.scan = newScan(page, sources, state)
+    end
+    local scan = state.scan
+    if not advanceScan(scan, state, work) then return end
+    state.scan = nil
+    if not sameSources(scan.sources, getSources(page))
+        or scan.pinyin ~= (SQ.getOptions().pinyin == true) then
+        invalidateResults(state)
+        state.dueAt = now()
+        return
+    end
+    for i, container in ipairs(scan.sources) do
+        -- Native list comparison catches even same-size replacement or reorder.
+        if not scan.snapshots[i]:equals(container:getItems()) then
+            state.dueAt = now()
+            return
         end
     end
-    local changed = previousTotal ~= state.total
-    if not changed then
-        for item in pairs(state.matches) do
-            if not previousMatches[item] then changed = true; break end
-        end
+    if scan.changed or state.total ~= scan.total or not state.ready then
+        state.revision = state.revision + 1
     end
+    state.matches, state.counts, state.total = scan.matches, scan.counts, scan.total
+    state.sources = scan.sources
     state.ready = true
-    if changed or not previousReady then state.revision = state.revision + 1 end
+    state.auditAt = now() + AUDIT_INTERVAL_MS
 end
 
 function SQ.rowCount(row, state)
@@ -166,23 +242,40 @@ function SQ.drawMatches(pane, doDragged)
     if doDragged or not pane.parent or not pane.items then return end
     local page = pane.parent
     local state = SQ.getState(pane.player, page.onCharacter and "inventory" or "nearby")
-    if not state.compiled.active or not state.ready then return end
+    if not state.ready or state.total == 0 then return end
     local header, rowHeight = pane.headerHgt, pane.itemHgt
+    if rowHeight <= 0 then return end
     local scrollWidth = 0
     if pane.vscroll and pane.isVScrollBarVisible and pane:isVScrollBarVisible() then
         scrollWidth = pane.vscroll:getWidth()
     end
     local width, height = math.max(0, pane:getWidth() - 2 - scrollWidth), pane:getHeight()
+    local scroll = pane:getYScroll()
+    local first = math.max(1, math.floor(-scroll / rowHeight) + 1)
+    local last = math.min(#pane.items, math.ceil((height - header - scroll) / rowHeight))
+    if first > last then return end
     local showCounts = SQ.getOptions().showCounts
     local nativeHighlight = false
-    for index, row in ipairs(pane.items) do
+    -- The viewport may start on a child of a header just above it.
+    local firstRow = pane.items[first]
+    if type(firstRow) ~= "table" or (not firstRow.items and firstRow.type ~= "separator") then
+        for index = first - 1, 1, -1 do
+            local row = pane.items[index]
+            if type(row) == "table" and (row.items or row.type == "separator") then
+                nativeHighlight = row.type ~= "separator" and row.matchesSearch == true
+                break
+            end
+        end
+    end
+    for index = first, last do
+        local row = pane.items[index]
         -- CleanUI applies the group's native search flag to every expanded
         -- child. Its row map holds the actual child item, not that flag.
         if type(row) == "table" then
             if row.type == "separator" then nativeHighlight = false
             elseif row.items then nativeHighlight = row.matchesSearch == true end
         end
-        local y = (index - 1) * rowHeight + header + pane:getYScroll()
+        local y = (index - 1) * rowHeight + header + scroll
         if y + rowHeight > header and y < height then
             local count, total = SQ.rowCount(row, state)
             local dragged = pane.dragging ~= nil and pane.dragStarted and pane.selected and pane.selected[index]
@@ -197,11 +290,11 @@ function SQ.drawMatches(pane, doDragged)
                 end
                 pane:drawRectStatic(1, top, 3, bottom - top, 0.9, 0.82, 0.65, 1)
                 pane:drawRectBorderStatic(1, top, width, bottom - top, 0.65, 0.82, 0.65, 1)
-                if showCounts and total > 1 and top == y and bottom == y + rowHeight then
+                if showCounts and count < total and top == y and bottom == y + rowHeight then
                     local label = tostring(count) .. "/" .. tostring(total)
                     local labelWidth = getTextManager():MeasureStringX(UIFont.Small, label) + 6
                     pane:drawRectStatic(width - labelWidth, y + 1, labelWidth, rowHeight - 2, 0.9, 0.12, 0.08, 0.18)
-                    pane:drawTextRight(label, width - 3, y + 1 - pane:getYScroll(), 0.92, 0.8, 1, 1, UIFont.Small)
+                    pane:drawTextRight(label, width - 3, y + 1 - scroll, 0.92, 0.8, 1, 1, UIFont.Small)
                 end
             end
         end
@@ -230,7 +323,13 @@ end
 function SQ.registerPage(page)
     SQ.pages[page] = true
     for _, button in ipairs(page.backpacks or {}) do decorateButton(button, page) end
-    SQ.markDirty()
+    local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
+    if state.page == page and (state.scan or state.ready) then
+        local sources = getSources(page)
+        if state.scan and not sameSources(state.scan.sources, sources) then state.scan = nil end
+        if state.ready and not sameSources(state.sources, sources) then invalidateResults(state) end
+    end
+    markStateDirty(state, now() + REFRESH_DELAY_MS)
 end
 
 local function installRenderer()
@@ -256,28 +355,37 @@ function SQ.tick()
         if previous ~= nil and SQ.Integration then SQ.Integration.refreshOptions() end
     end
     local timestamp = now()
-    if dueAt == 0 and timestamp - lastRefresh < 1000 then return end
-    if dueAt > timestamp then return end
-    dueAt, lastRefresh = 0, timestamp
+    local ready
     for page in pairs(SQ.pages) do
         local current = page.onCharacter and getPlayerInventory(page.player) or getPlayerLoot(page.player)
-        if current ~= page then
-            SQ.pages[page] = nil
-        elseif page:isReallyVisible() then
-            SQ.refreshPage(page)
-        else
-            -- Hidden pages must not advertise out-of-range results.
-            local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
-            if state.ready then state.revision = state.revision + 1 end
-            state.ready = false
-            state.matches, state.counts, state.total = {}, {}, 0
+        local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
+        if current ~= page then SQ.pages[page] = nil end
+        if current ~= page or not page:isReallyVisible() then
+            if state.page == page then
+                invalidateResults(state)
+                state.scan, state.auditAt, state.page, state.matchText = nil, nil, nil, nil
+            end
+        elseif active(state) and (state.scan or timestamp >= (state.dueAt or state.auditAt or 0)) then
+            ready = ready or {}
+            ready[#ready + 1] = page
         end
+    end
+    if not ready then return end
+
+    local work = {steps = SLICE_MAX_STEPS, deadline = timestamp + SLICE_BUDGET_MS}
+    local first = (nextPage - 1) % #ready + 1
+    for offset = 0, #ready - 1 do
+        if work.steps == 0 or now() >= work.deadline then break end
+        local index = (first + offset - 1) % #ready + 1
+        SQ.refreshPage(ready[index], work)
+        nextPage = index + 1
     end
 end
 
 local function start()
     SQ.states = {}
     SQ.pages = setmetatable({}, {__mode = "k"})
+    nextPage = 1
     Core.clearMetadataCache()
     modNames = {}
     SQ.Text.setConverter(nil)

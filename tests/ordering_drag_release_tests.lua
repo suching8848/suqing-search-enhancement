@@ -1,5 +1,5 @@
--- Loaded after ordering_bootstrap, Ordering and a source-verified fixture of
--- the current CleanUI release handlers. No game, UI or save is opened.
+-- Uses the source-verified CleanUI input handlers and the deployed Proximity
+-- selection wrapper on a model pane. No game, UI or save is opened.
 local M, O = OrderingMock, SuQingSearch.Ordering
 assert(CleanUIReleaseFixture, "load the verified CleanUI release fixture first")
 local cases, assertions = 0, 0
@@ -12,18 +12,44 @@ local function case()
     M.dragReset()
     M.options.sortMatches = true
 end
-function getSpecificPlayer() return {} end
+local player = { nullifyAiming = function() end }
+function getSpecificPlayer() return player end
+function getCore() return { getGameMode = function() return "Sandbox" end } end
+function getPlayerInventory() return {} end
+function getPlayerLoot() return {} end
+function CleanUI_getColumnDividerAtPoint() return nil end
 function isShiftKeyDown() return false end
 
-local function makePane(prefix)
+local cleanDir, bridgeDir = "D:/fixture/CleanUI/42.19", "D:/fixture/SuQingUIInteractionFixes/42"
+local inputPaths = {
+    [ISInventoryPane.onMouseDown] = cleanDir .. "/media/lua/client/ISUI/ISInventoryPane.lua",
+    [ISInventoryPane.onMouseDoubleClick] = cleanDir .. "/media/lua/client/ISUI/ISInventoryPane.lua",
+}
+function getFilenameOfClosure(callback) return inputPaths[callback] end
+local mockModInfo = getModInfoByID
+function getModInfoByID(id)
+    if id == "SuQingUIInteractionFixes" then
+        return { getModVersion = function() return "1.0.1" end, getVersionDir = function() return bridgeDir end }
+    end
+    local info = mockModInfo(id)
+    if info and id == "CleanUI" then info.getVersionDir = function() return cleanDir end end
+    return info
+end
+SuQingSearch.Integration = { reviewedNativeSearch = function() return true end }
+M.emit("OnGameStart")
+assert(SuQingUIInteractionFixes.proximitySelection.installed, "use the deployed Proximity input wrapper")
+inputPaths[ISInventoryPane.onMouseDown] = bridgeDir .. "/media/lua/client/SuQing_ProximitySelectionFix.lua"
+inputPaths[ISInventoryPane.onMouseDoubleClick] = bridgeDir .. "/media/lua/client/SuQing_ProximitySelectionFix.lua"
+
+local function makePane(prefix, kind)
     prefix = prefix or ""
     local items, rows = {}, {}
     for index, name in ipairs({"A", "B", "C", "D"}) do
         items[index] = M.item(prefix .. name)
         rows[index] = M.group(prefix .. name, {items[index]}, index)
     end
-    local pane = M.pane(rows, "backpack")
-    pane.parent.onCharacter = true
+    local pane = M.pane(rows, kind or "backpack")
+    pane.parent.onCharacter = kind ~= "proxInv"
     pane.column2, pane.column3, pane.mouseOverOption = 10, 20, 1
     pane.draggedItems = { reset = function() end }
     function pane:isMouseOverScrollBar() return false end
@@ -137,5 +163,74 @@ equal(M.order(pane), "A,B,C,D", "disable sorting restores native order after rea
 M.options.sortMatches = true
 draw(pane, state)
 equal(M.order(pane), "B,D,A,C", "enable sorting promotes matches without resetting drag history")
+
+local function makeStackPane(kind)
+    local stackPane, stackState, stackItems, groups = makePane("", kind)
+    local child = M.item("B second")
+    child.container = stackPane.inventory
+    groups[2].items[3] = child
+    groups[2].count = 3
+    stackPane.inventory:getItems().values[5] = child
+    stackState.matches[child] = true
+    stackPane.searchText, stackPane.searchCategoryText, stackPane.searchMode = nil, nil, "name"
+    stackPane.headerHgt, stackPane.itemHgt = 20, 20
+    draw(stackPane, stackState)
+    return stackPane, stackState, stackItems, groups, child
+end
+
+case()
+local child
+pane, state, items, rows, child = makeStackPane()
+for _, collapsed in ipairs({false, true}) do
+    local previousRefreshes = pane.refreshCalls
+    pane.mouseOverOption = 1
+    pane.selected[1] = rows[2]
+    M.buttons[0] = true
+    pane:onMouseDown(3, 24)
+    equal(pane.collapsed.B, collapsed, "real stack arrow toggles the group")
+    draw(pane, state)
+    equal(M.order(pane), "B,D,A,C", "the first held frame keeps the matches first")
+    equal(pane.items[2], collapsed and rows[4] or items[2], "row map immediately follows stack layout")
+    equal(pane.items[3], collapsed and rows[1] or child, "expanded stack exposes its physical child")
+    local hasSelection = false
+    for _ in pairs(pane.selected) do hasSelection = true; break end
+    equal(hasSelection, false, "original stack click clears selection")
+    equal(pane.refreshCalls, previousRefreshes + 1, "stack click rebuild is reused on the held frame")
+    M.buttons[0] = false
+    pane:onMouseUp(3, 24)
+    draw(pane, state)
+    equal(M.order(pane), "B,D,A,C", "release keeps the same order")
+    equal(pane.refreshCalls, previousRefreshes + 1, "release does not rebuild the stack again")
+end
+
+case()
+pane, state, items, rows, child = makeStackPane("proxInv")
+local selected = M.rowOf(pane, rows[3])
+pane.selected[selected], pane.firstSelect = rows[3], selected
+pane.mouseOverOption, pane.previousMouseUp = 1, 1
+pane.yScroll = -20
+M.buttons[0] = true
+local previousRefreshes = pane.refreshCalls
+pane:onMouseDoubleClick(3, 24)
+draw(pane, state)
+equal(pane.collapsed.B, false, "real double-click expands a Proximity group")
+equal(M.order(pane), "B,D,A,C", "Proximity group remains prioritized while held")
+equal(pane.items[3], child, "Proximity expanded row map follows the new children")
+equal(pane.selected[M.rowOf(pane, rows[3])], rows[3], "Proximity selection follows the original group")
+equal(pane.items[pane.firstSelect], rows[3], "Proximity Shift anchor follows the original group")
+equal(pane.yScroll, -20, "expansion does not reset scroll")
+equal(pane.refreshCalls, previousRefreshes + 1, "Proximity expansion reuses the click rebuild")
+
+case()
+pane, state, items, rows = makeStackPane()
+M.buttons[0] = true
+pane:onMouseDown(3, 24)
+state.revision, state.matches = state.revision + 1, {[items[3]] = true}
+draw(pane, state)
+equal(M.order(pane), "A,B,C,D", "stack gesture cannot apply a different query while held")
+M.buttons[0] = false
+pane:onMouseUp(3, 24)
+draw(pane, state)
+equal(M.order(pane), "C,A,B,D", "new query applies after release")
 
 return "SQSEARCH_DRAG_RELEASE cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

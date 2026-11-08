@@ -601,4 +601,51 @@ equal(getmetatable(pane.selected), nil, "renderer error removes temporary select
 draw(pane, state)
 equal(M.order(pane), "B,D,A,C", "renderer failure leaves ordering retry available")
 
+-- Integration audits the active native methods independently. This fixture
+-- exercises the safe reuse path while the other cases cover its fallback.
+case()
+SuQingSearch.Integration = {
+    reviewedNativeSearch = function(p, refresh)
+        return p.searchContainer == ISInventoryPane.searchContainer and refresh == ISInventoryPane.refreshContainer
+    end,
+}
+pane, state, items, groups = makeFour("proxInv", true)
+draw(pane, state)
+equal(pane.refreshCalls, 1, "first reviewed finalizer creates native baseline")
+pane.selected[M.rowOf(pane, items[3])] = items[3]
+pane.firstSelect = M.rowOf(pane, items[3])
+state.matches = { [items[1]] = true, [items[4]] = true }
+state.revision = state.revision + 1
+draw(pane, state)
+equal(M.order(pane), "A,D,B,C", "new hit revision partitions the canonical native order")
+equal(pane.refreshCalls, 1, "hit-only revision does not rebuild inventory rows")
+equal(pane.selected[M.rowOf(pane, items[3])], items[3], "selection follows physical row without native generation change")
+equal(pane.items[pane.firstSelect], items[3], "Shift anchor follows physical row without native generation change")
+
+state.ready = false
+draw(pane, state)
+equal(M.order(pane), "A,B,C,D", "pending new query restores clean native baseline")
+equal(pane.refreshCalls, 1, "restoring clean native baseline does not rebuild inventory rows")
+state.ready = true
+state.revision = state.revision + 1
+draw(pane, state)
+equal(M.order(pane), "A,D,B,C", "completed new query reuses native baseline")
+equal(pane.refreshCalls, 1, "completed new query does not rebuild unchanged rows")
+
+pane.itemslist[1], pane.itemslist[2] = pane.itemslist[2], pane.itemslist[1]
+draw(pane, state)
+equal(M.order(pane), "A,D,B,C", "in-place external reorder is repaired")
+equal(pane.refreshCalls, 2, "in-place external reorder invalidates native baseline")
+pane.inventory.dirty = true
+draw(pane, state)
+equal(pane.refreshCalls, 3, "physical dirty change still rebuilds")
+draw(pane, state, false, rebuildDuringRender)
+equal(pane.refreshCalls, 4, "in-render rebuild executes exactly once")
+state.matches = { [items[2]] = true, [items[3]] = true }
+state.revision = state.revision + 1
+draw(pane, state)
+equal(M.order(pane), "B,C,A,D", "new hits reuse the most recent in-render baseline")
+equal(pane.refreshCalls, 4, "most recent in-render baseline avoids duplicate rebuild")
+SuQingSearch.Integration = nil
+
 return "SQSEARCH_ORDERING cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

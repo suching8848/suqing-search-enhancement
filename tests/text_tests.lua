@@ -113,17 +113,53 @@ equal(T.matches("\231\137\155\232\130\137\233\165\188", "NRB", true), false, "un
 
 cases = cases + 1
 local boundedCalls = 0
-T.setConverter(function(text, delimiter) boundedCalls = boundedCalls + 1; return "converted" end)
-local accidentalHits = 0
-for index = 1, 512 do if T.matches("target-" .. tostring(index), "absent", true) then accidentalHits = accidentalHits + 1 end end
-equal(accidentalHits, 0, "cache population does not broaden nonmatching queries")
-equal(boundedCalls, 512, "512 unique names converted once")
-T.matches("target-1", "absent", true)
-equal(boundedCalls, 512, "earliest name retained through cache capacity")
-T.matches("target-513", "absent", true)
-equal(boundedCalls, 513, "next unique name converted at capacity boundary")
-for index = 1, 512 do T.matches("target-" .. tostring(index), "absent", true) end
-equal(boundedCalls > 513, true, "bounded eviction allows some older names to be recomputed")
+T.setConverter(function()
+    boundedCalls = boundedCalls + 1
+    return "converted"
+end)
+local function scanNames(term)
+    local match = T.newMatcher(true)
+    local hits = 0
+    for index = 1, 600 do
+        if match("name-" .. tostring(index), term) then hits = hits + 1 end
+        if match("type-" .. tostring(index), term) then hits = hits + 1 end
+    end
+    return hits
+end
+equal(scanNames("absent"), 0, "cache population does not broaden nonmatching queries")
+equal(boundedCalls, 1200, "600 unique names and types converted once")
+equal(scanNames("absent"), 0, "same query remains a miss in the warm scan")
+equal(scanNames("conver-ted"), 1200, "warm scan reuses candidates for another query")
+equal(boundedCalls, 1200, "two warm scans perform zero repeated conversions")
+for index = 1, 3600 do T.matches("more-" .. tostring(index), "absent", true) end
+equal(boundedCalls, 4800, "new distinct names converted once")
+T.matches("more-600", "absent", true)
+equal(boundedCalls, 4800, "eviction retains a recent name instead of clearing the whole cache")
+T.matches("name-1", "absent", true)
+equal(boundedCalls, 4801, "bounded eviction drops the oldest name")
+
+cases = cases + 1
+boundedCalls = 0
+T.setConverter(function()
+    boundedCalls = boundedCalls + 1
+    return "converted"
+end)
+for _ = 1, 2 do
+    local match = T.newMatcher(true)
+    for index = 1, 4200 do match("item-" .. tostring(index), "absent") end
+end
+equal(boundedCalls, 4304, "an over-capacity scan retains the first 4096 conversions between scans")
+
+cases = cases + 1
+local match = T.newMatcher(true)
+local literalOnly = T.newMatcher(false)
+equal(match("original-name", "ORIGINAL NAME"), true, "scan prepares compact case-insensitive term")
+equal(match("original-name", "converted"), true, "scan uses optional pinyin")
+equal(literalOnly("original-name", "converted"), false, "scan option gates pinyin")
+equal(match("replacement-name", "ORIGINAL NAME"), false, "new text is not pinned to a previous result")
+T.setConverter(function() return "changed" end)
+equal(match("original-name", "converted"), false, "converter reset invalidates a scan's positive memo")
+equal(match("original-name", "changed"), true, "scan can use the replacement converter")
 
 cases = cases + 1
 T.setConverter(actualConverter)

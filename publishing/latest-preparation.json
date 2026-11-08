@@ -1,13 +1,11 @@
 {
-  "prepared_at_bjt": "2026-11-07T06:46:27.287152+08:00",
+  "prepared_at_bjt": "2026-11-08T16:24:12.024721+08:00",
   "mod_id": "SuQingSearchEnhancement",
-  "version": "0.1.2",
-  "release_manifest": "release/0.1.2_20261107_064627_publication-repair/release-manifest.json",
-  "workshop_upload_folder": "release/0.1.2_20261107_064627_publication-repair/workshop-upload/SuQingSearchEnhancement",
+  "version": "0.1.3",
+  "release_manifest": "release/0.1.3_20261108/release-manifest.json",
+  "workshop_upload_folder": "release/0.1.3_20261108/workshop-upload/SuQingSearchEnhancement",
   "workshop_item_id": "3834692575",
-  "uploaded": true,
-  "git_committed_or_pushed": true,
-  "description_utf8_bytes": 7478,
-  "native_verification": "release/0.1.2_20261107_064627_publication-repair/native-verification.json",
-  "current_state_policy": "Current release pointer; immutable freeze manifest retains its preparation-time state, current upload proof is native-verification.json."
+  "uploaded": false,
+  "git_committed_or_pushed": false,
+  "description_utf8_bytes": 7581
 }

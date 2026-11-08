@@ -5,7 +5,7 @@ Search logic inspired by Minecraft JEI. Find carried and nearby items by name, s
 **Opening and settings**
 F8 opens Carried/Nearby search. Eight personal settings under Options > Mod Options > SuQing's Search Enhancement control field integration, counts, priority and available pinyin (on by default), click popup, expanded help and context entry (off), and the shortcut (F8). The core uses the game's built-in settings API with no external hard requirement.
 A separate Sandbox Options > SuQing's Search Enhancement > Existing search-field handling setting defaults to all searches. Special syntax only keeps ordinary words/Chinese names with native matching and yellow highlights. @, &, -, |, quotes and whitespace AND activate enhancement; surrounding whitespace alone does not. The F8 panel always enhances searches. Missing values in old worlds use the default without editing the save.
-Enhanced hits have purple outlines plus original yellow search highlights. Selection/hover retain their backgrounds and the match outline. Priority follows filtering, in-place sorting and rendering refreshes while preserving order within groups. Clearing/disabling priority restores native order; dragging, mouse holds and marquee selection defer reordering. Priority resumes after drag release without another item-list click.
+Enhanced hits have purple outlines plus original yellow search highlights. Selection/hover retain their backgrounds and the match outline. Priority follows filtering, in-place sorting and rendering refreshes while preserving order within groups. Clearing or disabling priority restores native order. Dragging, ordinary mouse holds and marquee selection defer reordering. Priority resumes after drag release without another item-list click.
 
 **Queries**
 brewing: partial name match.
@@ -23,7 +23,7 @@ Names, type names and source display names ignore ASCII case and tolerate whites
 Targets B42.21 single-player detailed lists; icon grids are not adapted. Carried reads listed inventory/bags; Nearby reads accessible, explored containers and visible floor items. No world scanning, exploration or loot generation. Items/save structures are unchanged; queries are session-only. Exit normally, disable and restart to remove UI behavior. Manual/Workshop copies share one Mod ID; keep one loading source.
 
 **Validation and assets**
-On 2026-11-07 the user confirmed the 0.1.2 search-priority fix in their current local B42.21 single-player setup; 1147 offline assertions passed. Exhaustive sandbox modes, complete English UI, controllers, all third-party combinations, other versions, multiplayer and performance gains remain unverified.
+Version 0.1.3 spreads scans across frames, reuses text and pinyin results, and evicts pinyin cache entries individually. Matching stacks stay prioritized when expanded or collapsed in CleanUI. On 2026-11-08 the user confirmed the reported hitch was gone and stack toggles worked normally in their local B42.21 single-player save. All 1,253 offline assertions passed.
 Cover/separate transparent icon use AI-assisted artwork; the character is not an in-game skin/outfit. Thanks to integration authors; upstream rights remain theirs.
 
 Mod ID: SuQingSearchEnhancement

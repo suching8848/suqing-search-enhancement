@@ -1,5 +1,23 @@
 # Changes / 更新
 
+## 0.1.3 · 2026-11-08
+
+搜索扫描分摊到多帧，复用文字和拼音结果并逐项淘汰缓存。已核对的 CleanUI 路径减少重复列表重建。展开或折叠命中堆叠时复用原生刷新并保持置顶，保留原有选中及 Shift 锚点行为。用户在本机 B42.21 单人档确认原卡顿消失，展开和折叠恢复正常。离线回归通过 1,253 条断言。
+
+Spreads search scans across frames, reuses text and pinyin results, and evicts cache entries individually. Reviewed CleanUI paths avoid redundant list rebuilds. Stack toggles reuse the native rebuild and keep matches first while retaining native selection and Shift-anchor behavior. The user confirmed the reported hitch was gone and stack toggles worked normally in their local B42.21 single-player save. All 1,253 offline assertions passed.
+
+## 0.1.3-rc.2 · 2026-11-08
+
+修复 CleanUI 中展开或折叠命中堆叠时的列表闪回。纯堆叠点击完成后，复用原生重建结果，在首帧保留当前查询的置顶和原生选择行为。拖拽、框选及搜索变更仍按现有保护处理。用户在 0.1.3-rc.1 正式档测试中确认原卡顿消失；本次界面修复待游戏内复验。
+
+Fixes the CleanUI list flicker when expanding or collapsing a matching stack. After a stack toggle, reuses the native rebuild and retains priority for the current query on the first frame. Drag, marquee and query changes keep their existing guards. The reported search hitch did not recur in the user's 0.1.3-rc.1 single-player test. In-game retesting of this UI fix is pending.
+
+## 0.1.3-rc.1 · 2026-11-08
+
+将随身与附近搜索分帧执行，核对容器范围和内容后发布命中及计数。复用同一查询的文字匹配，避免拼音缓存整表清空。已审查的 CleanUI 搜索路径在筛选条件与列表不变时减少重复重建，搜索高亮按可见行绘制。游戏内性能待验收。
+
+Spreads carried and nearby searches across updates and publishes hits and counts after validating the containers and their contents. Reuses text matches within a query and evicts pinyin cache entries individually. Reviewed CleanUI search paths avoid repeat rebuilds when the list and filters are unchanged. Highlights draw within the viewport. In-game performance validation is pending.
+
 ## 0.1.2 · 2026-11-07
 
 修复拖拽物品结束后直接搜索无法置顶：CleanUI 保留的历史拖拽标记不再阻塞排序，真正的拖拽、鼠标按住和框选仍延后重排。保持既有选择／Shift 锚点、清空恢复及拼音规则。补充真实 CleanUI 鼠标释放函数的离线回归，说明“编织／变质”同音命中。用户于 2026-11-07 确认当前本机 B42.21 单人配置中搜索置顶修复有效。

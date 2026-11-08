@@ -182,6 +182,21 @@ test("@Modern-Firearms-System", gun, false, "Mod ID alone never uses human separ
 cases = cases + 1
 equal(providerCalls, 0, "literal Mod ID path does not invoke human text provider without human names")
 
+local scanOptions = {
+    scanTextMatcher = function(text, query)
+        providerCalls = providerCalls + 1
+        return sharedMatcher(text, query)
+    end,
+    modNames = sharedOptions.modNames,
+}
+test("@XDQX &Base.M110", gun, true, "scan matcher participates in source and exact ID query", scanOptions)
+test("NRB -@XDQX", cnItem, true, "scan matcher participates in name and source exclusion", scanOptions)
+test("&Base.Nails", nails, true, "standalone ID still bypasses the scan matcher", scanOptions)
+equal(providerCalls, 4, "only name, source display name and vanilla aliases use scan matcher")
+test("牛肉", cnItem, true, "literal fallback survives failed scan matcher", {
+    scanTextMatcher = function() error("test scan failure") end,
+})
+
 -- Evaluate mixed displayed stacks per instance, never infer all rows from a head item.
 local mixedStack = { nails, nailsBox, item("Nails", "ThirdParty.Nails", "ModernFirearmsSystem", false) }
 local parsed = Core.compile("@MFS nails")

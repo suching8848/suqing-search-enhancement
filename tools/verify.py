@@ -63,8 +63,12 @@ def cleanui_release_fixture():
          "function ISInventoryPane:onMouseUpOutside(x, y)"),
         ("onMouseUpOutside", "function ISInventoryPane:onMouseUpOutside(x, y)",
          "function ISInventoryPane.getActualItems(items)"),
+        ("onMouseDoubleClick", "function ISInventoryPane:onMouseDoubleClick(x, y)",
+         "function ISInventoryPane:onMouseUp(x, y)"),
         ("onMouseUp", "function ISInventoryPane:onMouseUp(x, y)",
          "function ISInventoryPane:canPutIn()"),
+        ("onMouseDown", "function ISInventoryPane:onMouseDown(x, y)",
+         "function ISInventoryPane:getScrollHeight()"),
     ]
     for name, start_marker, end_marker in boundaries:
         assert text.count(start_marker) == text.count(end_marker) == 1, "CleanUI release method boundary changed: " + name
@@ -122,7 +126,8 @@ def main():
                                            LUA / "client/SuQingSearch/Ordering.lua", TESTS / "ordering_tests.lua"])
     release_fixture, release_source = cleanui_release_fixture()
     logs["ordering_drag_release"] = execute("ordering_drag_release", [TESTS / "ordering_bootstrap.lua",
-                     LUA / "client/SuQingSearch/Ordering.lua", release_fixture, TESTS / "ordering_drag_release_tests.lua"])
+                     LUA / "client/SuQingSearch/Ordering.lua", release_fixture, interaction_patch,
+                     TESTS / "ordering_drag_release_tests.lua"])
     pinyin_root = GAME.parent.parent / "workshop/content/108600/3657184750/mods/PinYinSearch/42.0/media/lua"
     pinyin_provider = pinyin_root / "client/pinyin.lua"
     pinyin_sources = {}
