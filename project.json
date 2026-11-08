@@ -27,9 +27,9 @@
       "result": "Reported search hitch no longer reproduced; list flickered while expanding a matching stack"
     }
   },
-  "state": "0.1.3 source promoted from user-confirmed 0.1.3-rc.2 with identical runtime Lua; release verification pending",
-  "workshop": "0.1.2 uploaded and native-readback verified public; existing item/visibility preserved",
-  "git": "Feature commit 25832d2 pushed to main at https://github.com/suching8848/suqing-search-enhancement",
+  "state": "0.1.3 released from user-confirmed rc.2 Lua; GitHub main pushed and native Workshop readback verified public",
+  "workshop": "Existing item 3834692575 updated to 0.1.3 and verified public by uncached native readback",
+  "git": "Feature commit 9e3db79d28b038ef1149991b8fac63189efef15a pushed to main at https://github.com/suching8848/suqing-search-enhancement",
   "gameplay_acceptance": {
     "status": "user_confirmed",
     "tested_version": "0.1.3-rc.2",
@@ -61,7 +61,7 @@
   "local_installed_version": "0.1.3-rc.2",
   "workshop_staging": "release/0.1.3_20261108/workshop-upload/SuQingSearchEnhancement",
   "release_manifest": "release/0.1.3_20261108/release-manifest.json",
-  "release_report": "publishing/发布记录_0.1.2.md",
+  "release_report": "publishing/发布记录_0.1.3.md",
   "cover_selection_pending": false,
   "cover_candidates": "art/cover-candidates_20261106/candidate-manifest.json",
   "selected_cover": {
@@ -138,10 +138,13 @@
   ],
   "candidate_publication": {
     "version": "0.1.3",
-    "workshop_uploaded": false,
-    "native_readback_verified": false,
-    "git_committed": false,
-    "git_pushed": false
+    "workshop_uploaded": true,
+    "native_readback_verified": true,
+    "git_committed": true,
+    "git_pushed": true,
+    "feature_commit": "9e3db79d28b038ef1149991b8fac63189efef15a",
+    "workshop_visibility": 0,
+    "native_verification": "release/0.1.3_20261108/native-verification.json"
   },
   "uploaded_verified_public": true,
   "previous_verified_release_preparation": {
@@ -150,5 +153,6 @@
     "workshop_staging": "release/0.1.2_20261107_064627_publication-repair/workshop-upload/SuQingSearchEnhancement",
     "release_manifest": "release/0.1.2_20261107_064627_publication-repair/release-manifest.json",
     "release_report": "publishing/发布记录_0.1.2.md"
-  }
+  },
+  "native_verification": "release/0.1.3_20261108/native-verification.json"
 }

@@ -5,7 +5,9 @@
   "release_manifest": "release/0.1.3_20261108/release-manifest.json",
   "workshop_upload_folder": "release/0.1.3_20261108/workshop-upload/SuQingSearchEnhancement",
   "workshop_item_id": "3834692575",
-  "uploaded": false,
-  "git_committed_or_pushed": false,
-  "description_utf8_bytes": 7581
+  "uploaded": true,
+  "git_committed_or_pushed": true,
+  "description_utf8_bytes": 7581,
+  "native_verification": "release/0.1.3_20261108/native-verification.json",
+  "current_state_policy": "Current release pointer; the immutable freeze manifest records preparation-time state."
 }
