@@ -1,0 +1,46 @@
+{
+  "version": "0.1.4-rc.3",
+  "workshop_item_id": "3834692575",
+  "status": "uploaded_verified_public",
+  "verified_at_bjt": "2026-11-12T16:29:34.338699+08:00",
+  "workshop_updated_at_bjt": "2026-11-12T16:29:33+08:00",
+  "git_feature_commit": "7f523ded93994a980bfce9548f1fe97cd710ef4a",
+  "visibility_value": 0,
+  "title": "蘇清的搜索增强 | SuQing's Search Enhancement",
+  "tags": [
+    "Build 42",
+    "Interface",
+    "QOL"
+  ],
+  "required_workshop_ids": [],
+  "content_tree_sha256": "673facfffb01cfee7e357b30151d437cf5eaf5348a63b94f515fb1d5293d79ba",
+  "content_files": 18,
+  "content_bytes": 772265,
+  "preview_size": 638215,
+  "title_sha256": "71e52d43cc98df584dcedbb4aabd83f21b10923803fabbfc4606575837e5190e",
+  "description_sha256": "0c90cc1f0f4ef93be7a62910f3203c7ffc34a936bef23e5beb867fdaa547c0c3",
+  "local_preview_sha256": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9",
+  "native_verification_receipt_sha256": "23a3dd27640b68a7a699ff898be1719fa1f9afde2b0e2ce495ecab22785a09e8",
+  "release_checks": {
+    "app_account_item": true,
+    "public_uncached": true,
+    "title": true,
+    "description": true,
+    "metadata": true,
+    "content_bytes": true,
+    "preview_size": true,
+    "tags": true,
+    "dependencies": true
+  },
+  "verification_scope": "Native success and uncached title/description/metadata/size/preview size/tags/dependencies; no remote file download or gameplay test.",
+  "offline_assertions": {
+    "42.21.0": 1302,
+    "42.22.2": 1302
+  },
+  "formal_installation": {
+    "version": "0.1.4-rc.3",
+    "position": 227,
+    "default_enabled": false
+  },
+  "gameplay_acceptance": "pending"
+}
