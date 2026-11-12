@@ -369,7 +369,7 @@ H.__index = nil
 
 -- Reviewed CleanUI's text callback must still see the real field and update
 -- controls. Only its identical native inventory-search operation is skipped.
-local cleanDir = "D:/fixtures/CleanUI/42.19"
+local cleanDir, cleanVersion = "D:/fixtures/CleanUI/42.22", "2.10.5"
 local refresh = function(self)
     self.refreshContainerCount = self.refreshContainerCount + 1
     self.itemslist = {}
@@ -390,7 +390,7 @@ getFilenameOfClosure = function(fn) return sources[fn] end
 getModInfoByID = function(id)
     if id == "CleanUI" then
         return {
-            getModVersion = function() return "2.10.4" end,
+            getModVersion = function() return cleanVersion end,
             getVersionDir = function() return cleanDir end,
         }
     end
@@ -401,6 +401,16 @@ local function newPane()
         refreshContainerCount = 0, searchContainer = search, refreshContainer = refresh,
     }
 end
+local reviewedPane = newPane()
+equal(SuQingSearch.Integration.reviewedNativeSearch(reviewedPane), true, "current CleanUI sources are reviewed")
+cleanVersion = "2.10.4"
+equal(SuQingSearch.Integration.reviewedNativeSearch(reviewedPane), true, "previous CleanUI remains reviewed")
+cleanVersion = "2.10.6"
+equal(SuQingSearch.Integration.reviewedNativeSearch(reviewedPane), false, "unknown CleanUI stays on fallback")
+cleanVersion = "2.10.5"
+CleanUI_SnakeUtilsRenderCompatInstalled = true
+equal(SuQingSearch.Integration.reviewedNativeSearch(reviewedPane), false, "Snake renderer combination stays on fallback")
+CleanUI_SnakeUtilsRenderCompatInstalled = nil
 local fast = handler("inventory", 3)
 local pane = newPane()
 fast.inventoryWindow.inventoryPane = pane

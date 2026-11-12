@@ -11,7 +11,8 @@ Keyboard = { KEY_A = 30 }
 ISMouseDrag = {}
 function getModInfoByID(id)
     if (id == "CleanUI" or id == "\\CleanUI") and M.cleanVersion then
-        return { getModVersion = function() return M.cleanVersion end }
+        return { getModVersion = function() return M.cleanVersion end,
+            getVersionDir = function() return M.cleanBranch end }
     end
     if (id == "NeatUI_Equipment" or id == "\\NeatUI_Equipment") and M.neatVersion then
         return { getModVersion = function() return M.neatVersion end }

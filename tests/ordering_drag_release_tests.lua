@@ -14,13 +14,15 @@ local function case()
 end
 local player = { nullifyAiming = function() end }
 function getSpecificPlayer() return player end
-function getCore() return { getGameMode = function() return "Sandbox" end } end
+function getCore() return { getGameMode = function() return "Sandbox" end, isTutorial = function() return false end } end
 function getPlayerInventory() return {} end
 function getPlayerLoot() return {} end
 function CleanUI_getColumnDividerAtPoint() return nil end
 function isShiftKeyDown() return false end
 
-local cleanDir, bridgeDir = "D:/fixture/CleanUI/42.19", "D:/fixture/SuQingUIInteractionFixes/42"
+M.cleanVersion = assert(CleanUIReleaseVersion)
+local cleanDir = "D:/fixture/CleanUI/" .. assert(CleanUIReleaseBranch)
+local bridgeDir = "D:/fixture/SuQingUIInteractionFixes/42"
 local inputPaths = {
     [ISInventoryPane.onMouseDown] = cleanDir .. "/media/lua/client/ISUI/ISInventoryPane.lua",
     [ISInventoryPane.onMouseDoubleClick] = cleanDir .. "/media/lua/client/ISUI/ISInventoryPane.lua",
@@ -29,7 +31,8 @@ function getFilenameOfClosure(callback) return inputPaths[callback] end
 local mockModInfo = getModInfoByID
 function getModInfoByID(id)
     if id == "SuQingUIInteractionFixes" then
-        return { getModVersion = function() return "1.0.1" end, getVersionDir = function() return bridgeDir end }
+        return { getModVersion = function() return SuQingUIInteractionFixes.proximitySelection.version end,
+            getVersionDir = function() return bridgeDir end }
     end
     local info = mockModInfo(id)
     if info and id == "CleanUI" then info.getVersionDir = function() return cleanDir end end
@@ -164,7 +167,7 @@ M.options.sortMatches = true
 draw(pane, state)
 equal(M.order(pane), "B,D,A,C", "enable sorting promotes matches without resetting drag history")
 
-local function makeStackPane(kind)
+local function makeStackPane(kind, preview)
     local stackPane, stackState, stackItems, groups = makePane("", kind)
     local child = M.item("B second")
     child.container = stackPane.inventory
@@ -174,6 +177,11 @@ local function makeStackPane(kind)
     stackState.matches[child] = true
     stackPane.searchText, stackPane.searchCategoryText, stackPane.searchMode = nil, nil, "name"
     stackPane.headerHgt, stackPane.itemHgt = 20, 20
+    if preview then
+        stackState.ready = false
+        stackState.preview = { matches = { [stackItems[2]] = true, [child] = true },
+            counts = { [stackPane.inventory] = 2 }, total = 2, virtualSources = {} }
+    end
     draw(stackPane, stackState)
     return stackPane, stackState, stackItems, groups, child
 end
@@ -220,6 +228,22 @@ equal(pane.selected[M.rowOf(pane, rows[3])], rows[3], "Proximity selection follo
 equal(pane.items[pane.firstSelect], rows[3], "Proximity Shift anchor follows the original group")
 equal(pane.yScroll, -20, "expansion does not reset scroll")
 equal(pane.refreshCalls, previousRefreshes + 1, "Proximity expansion reuses the click rebuild")
+
+case()
+local originalTimestamp = getTimestampMs
+getTimestampMs = function() return 1000 end
+pane, state, items, rows, child = makeStackPane(nil, true)
+equal(M.order(pane), "B,A,C,D", "partial matches are prioritized before the stack click")
+local beforeCompletion = pane.refreshCalls
+M.buttons[0] = true
+pane:onMouseDown(3, 24)
+state.ready, state.preview = true, nil
+draw(pane, state)
+equal(pane.collapsed.B, false, "the real stack handler expands while the search is completing")
+equal(M.order(pane), "B,D,A,C", "the first held frame applies the final matches without flashing native order")
+equal(pane.items[3], child, "the first held frame draws the expanded child")
+equal(pane.refreshCalls, beforeCompletion + 1, "search completion reuses the stack click rebuild")
+getTimestampMs = originalTimestamp
 
 case()
 pane, state, items, rows = makeStackPane()

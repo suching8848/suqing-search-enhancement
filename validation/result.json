@@ -1,16 +1,12 @@
 {
   "result": "PASS",
-  "checked_at": "2026-11-08T16:23:11.569525+08:00",
-  "game_version": "42.21.0 4a0e9546ec",
+  "checked_at": "2026-11-12T16:24:44.904859+08:00",
+  "game_version": "42.22.2 3d39148846 integrity=pending",
   "lua_product_files": 8,
   "runtime_classpath": [
     {
-      "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\pzopt\\aot\\pzopt.jar",
-      "sha256": "749cad6f1fe98a37b908583eaf5328ca85f75b80431edc5d31bec1127519639e"
-    },
-    {
       "path": "D:\\steam\\steamapps\\common\\ProjectZomboid\\projectzomboid.jar",
-      "sha256": "e1a69eb743ede60b213a0fe7f8b83d4fcab773036d256cc4543a336f3b058a33"
+      "sha256": "3c4a7c5f149d784758c6fb5f8fa85f3a21d572e38bc081400e89035f8120d287"
     }
   ],
   "regression": {
@@ -22,14 +18,14 @@
       "assertions": 21
     },
     "integration": {
-      "assertions": 170
+      "assertions": 174
     },
     "runtime": {
-      "assertions": 132,
-      "cases": 17
+      "assertions": 150,
+      "cases": 19
     },
     "panel": {
-      "assertions": 131,
+      "assertions": 134,
       "cases": 13
     },
     "settings": {
@@ -37,12 +33,12 @@
       "cases": 11
     },
     "ordering": {
-      "assertions": 205,
-      "cases": 33
+      "assertions": 224,
+      "cases": 35
     },
     "ordering_drag_release": {
-      "assertions": 64,
-      "cases": 10
+      "assertions": 69,
+      "cases": 11
     },
     "text_CN": {
       "assertions": 96,
@@ -57,16 +53,20 @@
       "cases": 53
     }
   },
-  "assertions": 1253,
+  "assertions": 1302,
   "ordering_compatibility_source": {
-    "path": "C:\\Users\\15792\\Zomboid\\mods\\SuQingUIInteractionFixes\\42\\media\\lua\\client\\SuQing_ProximitySelectionFix.lua",
-    "sha256": "5d41ca3e3729d81c0709439ee602b366222fba238f8f2a9211ef848da47e549f"
+    "path": "SuQingUIInteractionFixes/42/media/lua/client/SuQing_ProximitySelectionFix.lua",
+    "sha256": "2a81e315632c7b3bc230aaf03136f2d3c1a86c4fff291a9ecf9e009498abff29"
   },
   "ordering_drag_release_source": {
-    "path": "D:\\steam\\steamapps\\workshop\\content\\108600\\3437629766\\mods\\CleanUI\\42.19\\media\\lua\\client\\ISUI\\ISInventoryPane.lua",
-    "branch": "42.19",
-    "version": "2.10.4",
-    "sha256": "b0de68c2766c29ef26d001a20ba42e8fe17176b77eeaed1c73035b0e8e7ac06e",
+    "path": "D:\\steam\\steamapps\\workshop\\content\\108600\\3437629766\\mods\\CleanUI\\42.22\\media\\lua\\client\\ISUI\\ISInventoryPane.lua",
+    "branch": "42.22",
+    "version": "2.10.5",
+    "sha256": "34e7b696f17417b0e93cbb6b4d31e49b70bf5d2efa9e7975b362dd42df32ca0a",
+    "search_handler": {
+      "path": "D:\\steam\\steamapps\\workshop\\content\\108600\\3437629766\\mods\\CleanUI\\42.22\\media\\lua\\client\\ISUI\\CommonHandler\\InventorySearch.lua",
+      "sha256": "23e208c66901390befa9952d65c51ec008ae3dc1e5056fbd27d6669f597108af"
+    },
     "methods": [
       {
         "method": "onMouseDownOutside",
@@ -84,13 +84,13 @@
         "method": "onMouseDoubleClick",
         "start_line": 4275,
         "end_line": 4357,
-        "sha256": "6fe5a45264b5ebf16b8c699290dd38fe60ea40d1cb580fe8ee72e76d720e32be"
+        "sha256": "ed7556990a1ab03b5548d2fd60bbe13916170d2cccb73b8ad604263dd9d201a1"
       },
       {
         "method": "onMouseUp",
         "start_line": 4359,
         "end_line": 4446,
-        "sha256": "4b6f690f1725690adcf11b309f3ab8d13ebd8adab34a6d1587b4d6a605c2c2d0"
+        "sha256": "8d95e10967565b656849305205a1009095e8fc82603cd627a8ec89aa1c200c48"
       },
       {
         "method": "onMouseDown",
@@ -99,7 +99,7 @@
         "sha256": "391f82bb9aa41e177eba53b872bd567d32b6ad1a744e53674170c32d3231849d"
       }
     ],
-    "fixture_sha256": "4f32db3a6ed4143eefc102ed1fce6b6c2de75147fb10c7a4f9267acae5857248",
+    "fixture_sha256": "337d7828fce719aed2dda56dc5b23c52ef1186e22deece97a110293c7dc27556",
     "review_policy": "re-review branch, version and source hash before accepting upstream changes"
   },
   "pinyin_compatibility_sources": {
@@ -118,28 +118,28 @@
       }
     }
   },
-  "bilingual_ui_keys": 34,
+  "bilingual_ui_keys": 35,
   "bilingual_sandbox_keys": 5,
   "game_started": false,
-  "gameplay_acceptance": "not evaluated by offline tests; see project.json gameplay_acceptance",
+  "gameplay_acceptance": "Pending for 0.1.4-rc.3; see project.json working_candidate",
   "runtime_sha256": {
     "mods/SuQingSearchEnhancement/42/icon.png": "0d8d69e530fe768d73e2a7d0531ac4b4677c38cee34a16d5bdecf886950daa99",
-    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "e1f42297f3e57f9c58870240c1f53d8ff4683b70a93221f40878d13ecfa2ca71",
-    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "bbb5fd8c8d672f48a6b38185e241c9390c03a27d8987f16ecb5f014edcbaaa36",
-    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "09fef744a773fa25e7f1701a8de7f1d0824d6f9f157b5a13addb9c17e0586552",
-    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "a1d238aa39224aac170b8d1df17b7f80b02a610472e934d78c209fdbccb34632",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Integration.lua": "ae9ab8440ba712976605874896d12e393f858fdef4234b6d4089d3d036bedacf",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Ordering.lua": "a7e1cd0ab138f0058458b07117119a8bfee58c28df282daa9ed2e4415e7b705a",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Panel.lua": "468f03529200c5e572861a7e01b50ea6940887b2557d04a410e963b0410d505f",
+    "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Runtime.lua": "6fdb1107e4301ef06e6e7f0b334e2e3ebb0d7a5a1d83ad902983843fddb3861b",
     "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearch/Settings.lua": "26ae64769ca9ad3cd3cc38c7e88373d33c5d71d2c544c10b1290d634b6174b68",
     "mods/SuQingSearchEnhancement/42/media/lua/client/SuQingSearchEnhancement.lua": "486b78e721f80f5efb03028ef5319b233dc0bb35c6d355d465768e3b17cce6af",
     "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Core.lua": "42b992fb923d4ed43701018f1db6579ce5c9afb84e3d329188d365ff30f26608",
     "mods/SuQingSearchEnhancement/42/media/lua/shared/SuQingSearch/Text.lua": "4f464eb395aa66e8e4d300e39354bf02961e9ba8afdf7a22d1292f19bb00db30",
     "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/CN/Mod.json": "bbd9d059f9f3427d3671d964e0c1843eaf51b97d2937f89d37e05b25992e5631",
     "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/CN/Sandbox.json": "b412a8058e1b032141a46e0e20d8616ccae57b2e8b2619fb50ff564d4fd8d77f",
-    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/CN/UI.json": "6a91c2ab4d3caa9837d36d577ca3ab81ddc4327c7b34126896607626124a808c",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/CN/UI.json": "5505efe53d9f50723f58aa6522fb13c9fb8721a776cf1a3ca3ababfe3365ddb9",
     "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/EN/Mod.json": "0a6ef66a6e4a554300d0ca60beba4252a2169912a8b898d7c73f9cd5e0d8fe7d",
     "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/EN/Sandbox.json": "1e119e6ebb4f6edc3a73581f172a3ca8f946c496d088be9bedd21520b8120515",
-    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/EN/UI.json": "c7fcb57cccf33808d9ad7663ff9cf76edf4da49185b5215435b96a2041e512aa",
+    "mods/SuQingSearchEnhancement/42/media/lua/shared/Translate/EN/UI.json": "e6fdf0fd6aaa2a0cbe7ea87d4c51ccd1073fb8d92449141e7e3ea70f71fc2ca9",
     "mods/SuQingSearchEnhancement/42/media/sandbox-options.txt": "8328d0aec725ae07ed1a15931bb453e5df82ad1277c262812c1331f285fbe9f0",
-    "mods/SuQingSearchEnhancement/42/mod.info": "c69847649fa5baf14c82e69e1a815f6faaa90f411117350c17e3603c2b5a6b41",
+    "mods/SuQingSearchEnhancement/42/mod.info": "2b999791e6e99b7744fbc0aad46a93e6ad113b5c8047e8c828b0961077336d55",
     "mods/SuQingSearchEnhancement/42/poster.png": "49ac0ac59159099626047688a9942adbc7bd13e62223464941bc316bc98b18b9"
   }
 }

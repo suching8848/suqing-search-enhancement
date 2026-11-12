@@ -39,7 +39,7 @@ M.emit("OnGameStart")
 case()
 local realFix = assert(SuQingUIInteractionFixes and SuQingUIInteractionFixes.proximitySelection,
     "load the real deployed proximity selection patch before this test")
-equal(realFix.version, "1.0.1", "reviewed real selection bridge version")
+equal(realFix.version == "1.0.1" or realFix.version == "1.0.2" or realFix.version == "1.0.3", true, "reviewed real selection bridge version")
 equal(realFix.installed, true, "real patch installed through OnGameStart")
 local pane, state, items, groups = makeFour()
 local backingItems = pane.inventory:getItems().values
@@ -387,8 +387,12 @@ draw(pane, state)
 equal(pane.yScroll, -90, "clearing query does not force scroll movement")
 
 case()
-for _, version in ipairs({ "2.10.4", "2.10.5", "missing" }) do
-    M.cleanVersion = version == "missing" and nil or version
+for _, fixture in ipairs({
+    { "2.10.4", "42.19", true }, { "2.10.5", "42.22", true },
+    { "2.10.5", "42.16", false }, { "2.10.6", "42.22", false }, { false, "42.22", false },
+}) do
+    local version, branch, reviewed = fixture[1], fixture[2], fixture[3]
+    M.cleanVersion, M.cleanBranch = version, "D:/fixture/CleanUI/" .. branch
     pane, state, items, groups = makeFour()
     local marker = M.separator(".")
     pane.canonical = { groups[1], groups[2], marker, groups[3], groups[4] }
@@ -396,15 +400,15 @@ for _, version in ipairs({ "2.10.4", "2.10.5", "missing" }) do
     M.nativeRender(pane, false)
     pane.renderCalls = 0
     draw(pane, state)
-    if version == "2.10.4" then
+    if reviewed then
         equal(M.order(pane), "B,D,A,C", "only audited CleanUI decorative separator removed")
         equal(#pane.itemslist, 4, "audited decorative separator removal keeps all physical groups")
     else
-        equal(M.order(pane), "B,A,.,D,C", "unknown CleanUI version keeps decorative separator as section boundary " .. version)
-        equal(pane.itemslist[3], marker, "unknown version keeps exact separator identity " .. version)
+        equal(M.order(pane), "B,A,.,D,C", "unreviewed CleanUI keeps decorative separator as section boundary")
+        equal(pane.itemslist[3], marker, "unreviewed CleanUI keeps exact separator identity")
     end
 end
-M.cleanVersion = "2.10.4"
+M.cleanVersion, M.cleanBranch = "2.10.4", nil
 
 case()
 pane, state, items, groups = makeFour("proxInv", true)
@@ -646,6 +650,67 @@ state.revision = state.revision + 1
 draw(pane, state)
 equal(M.order(pane), "B,C,A,D", "new hits reuse the most recent in-render baseline")
 equal(pane.refreshCalls, 4, "most recent in-render baseline avoids duplicate rebuild")
+
+case()
+local originalTimestamp = getTimestampMs
+local previewTime = 1000
+getTimestampMs = function() return previewTime end
+pane, state, items = makeFour("crate", true)
+local otherPane, _, otherItems = makeFour("bag", true)
+state.ready = false
+local preview = { matches = { [items[2]] = true, [otherItems[2]] = true },
+    counts = { [pane.inventory] = 1, [otherPane.inventory] = 1 }, total = 2, virtualSources = {} }
+state.preview = preview
+pane.selected[M.rowOf(pane, items[3])] = items[3]
+pane.firstSelect = M.rowOf(pane, items[3])
+draw(pane, state)
+draw(otherPane, state)
+equal(M.order(pane), "B,A,C,D", "first partial hit is ordered immediately")
+equal(M.order(otherPane), "B,A,C,D", "each source orders its first partial hit")
+equal(pane.refreshCalls, 1, "first preview captures the reviewed native baseline")
+
+previewTime = previewTime + 119
+preview.matches[items[4]] = true
+preview.counts[pane.inventory], preview.total = 2, 3
+draw(pane, state)
+equal(M.order(pane), "B,A,C,D", "subsequent hits within the interval defer reordering")
+previewTime = previewTime + 1
+draw(pane, state)
+equal(M.order(pane), "B,D,A,C", "the next allowed sort orders all accumulated hits")
+equal(pane.refreshCalls, 1, "a preview batch reuses the native rows")
+equal(pane.selected[M.rowOf(pane, items[3])], items[3], "preview sort retains selected item")
+equal(pane.items[pane.firstSelect], items[3], "preview sort retains the Shift anchor")
+
+local savedWipe, otherWipes = table.wipe, 0
+table.wipe = function(values)
+    if values == otherPane.selected then otherWipes = otherWipes + 1 end
+    return savedWipe(values)
+end
+draw(otherPane, state)
+table.wipe = savedWipe
+equal(otherWipes, 0, "hits in another physical source do not repartition this pane")
+equal(M.order(otherPane), "B,A,C,D", "an unaffected source retains its current priority")
+
+previewTime = previewTime + 1
+preview.matches[items[1]] = true
+preview.counts[pane.inventory], preview.total = 3, 4
+state.matches, state.ready, state.preview = preview.matches, true, nil
+draw(pane, state)
+equal(M.order(pane), "A,B,D,C", "completed results flush pending priority before the interval")
+equal(pane.refreshCalls, 1, "completion still uses the reviewed native rows")
+
+case()
+pane, state, items = makeFour("proxInv", true)
+state.ready = false
+state.preview = { matches = { [items[2]] = true }, counts = {}, total = 1,
+    virtualSources = { [pane.inventory] = true } }
+draw(pane, state)
+equal(M.order(pane), "B,A,C,D", "virtual view orders the first physical hit before its count is projected")
+state.preview, state.revision = nil, state.revision + 1
+draw(pane, state)
+equal(M.order(pane), "A,B,C,D", "invalidating an incomplete preview restores native order")
+equal(pane.refreshCalls, 1, "invalidating the preview reuses the reviewed native rows")
+getTimestampMs = originalTimestamp
 SuQingSearch.Integration = nil
 
 return "SQSEARCH_ORDERING cases=" .. tostring(cases) .. " assertions=" .. tostring(assertions) .. " failures=0"

@@ -1,5 +1,23 @@
 # Changes / 更新
 
+## 0.1.4-rc.3 · CleanUI 2.10.5
+
+恢复 CleanUI 2.10.5 在 B42.21.0 和 B42.22.2 的搜索行复用与堆叠展开置顶。识别批量转移 1.2.4 和融合选区 1.0.3 的函数来源。两个版本各通过 1,302 条离线断言，游戏内待验收。
+
+Restores row reuse and priority during stack expansion in CleanUI 2.10.5 on B42.21.0 and B42.22.2. Recognizes the reviewed Bulk Transfer 1.2.4 and Proximity Selection 1.0.3 wrappers. Each build passed 1,302 offline assertions. In-game testing is pending.
+
+## 0.1.4-rc.2 · B42.22.2
+
+当前源码为 0.1.4-rc.2 候选，面向 Project Zomboid B42.21 和 B42.22.2 单人。CleanUI 42.22 恢复被选堆叠的可见子行，搜索置顶与刷新保留这一行为及 Shift 锚点。
+
+The current source is candidate 0.1.4-rc.2 for Project Zomboid B42.21 and B42.22.2 single-player. Search priority and refreshes preserve the visible child selections and Shift anchor of a selected stack in CleanUI 42.22.
+
+## 0.1.4-rc.1 · 2026-11-09
+
+保留分帧扫描。首批命中立即高亮和置顶，后续高亮随扫描补齐，稳定列表的置顶更新按短间隔合并。F8 在首轮核对完成前显示「搜索中」。换词、隐藏界面或容器快照失效会清除临时结果。游戏内性能待验收。
+
+Keeps scans spread across updates. Highlights and prioritizes the first matches immediately, adds later highlights as the scan progresses, and batches further priority updates for stable lists. F8 shows “Searching” until the initial results are validated. Query changes, hidden pages and invalidated container snapshots clear provisional results. In-game performance validation is pending.
+
 ## 0.1.3 · 2026-11-08
 
 搜索扫描分摊到多帧，复用文字和拼音结果并逐项淘汰缓存。已核对的 CleanUI 路径减少重复列表重建。展开或折叠命中堆叠时复用原生刷新并保持置顶，保留原有选中及 Shift 锚点行为。用户在本机 B42.21 单人档确认原卡顿消失，展开和折叠恢复正常。离线回归通过 1,253 条断言。

@@ -34,9 +34,29 @@ local function captureAnchors(pane, saved)
     end
 end
 
+local function cleanUIBranch(info)
+    local branch = info.getVersionDir and info:getVersionDir()
+    return type(branch) == "string" and branch:gsub("\\", "/"):match("/([^/]+)/?$")
+end
+
+local function reviewedCleanUI(info)
+    info = info or (getModInfoByID and (getModInfoByID("CleanUI") or getModInfoByID("\\CleanUI")))
+    if not info or not info.getModVersion then return false end
+    local version = tostring(info:getModVersion())
+    if version == "2.10.4" then return true end
+    if version ~= "2.10.5" or CleanUI_SnakeUtilsRenderCompatInstalled then return false end
+    local branch = cleanUIBranch(info)
+    return branch == "42.19" or branch == "42.22"
+end
+
+local function expandedSelection()
+    local info = getModInfoByID and (getModInfoByID("CleanUI") or getModInfoByID("\\CleanUI"))
+    return info and reviewedCleanUI(info) and cleanUIBranch(info) == "42.22"
+end
+
 local function snapshot(pane, selected)
     local saved = { inventory = pane.inventory, items = {}, groups = {}, raw = {},
-        first = pane.firstSelect, joyIndex = pane.joyselection }
+        first = pane.firstSelect, joyIndex = pane.joyselection, expandedSelection = expandedSelection() }
     for key, value in pairs(selected) do
         saved.raw[key] = value
         local id, group = identity(value)
@@ -48,10 +68,28 @@ local function snapshot(pane, selected)
     return saved
 end
 
-local function selectedValue(saved, value)
+local function selectedValue(saved, rows, row)
+    if type(row) ~= "number" then return nil end
+    local value = rows and rows[row]
     local id, group = identity(value)
-    if id ~= nil and ((group and saved.groups[id]) or (not group and saved.items[id])) then
+    if id == nil then return nil end
+    if group then
+        if saved.groups[id] then return value end
+        if saved.expandedSelection then
+            local displayItem = value.cleanUIDisplayItem or value.firstItem or value.items[1]
+            if saved.items[displayItem] then return displayItem end
+        end
+    elseif saved.items[id] then
         return value
+    elseif saved.expandedSelection and not empty(saved.groups) then
+        for prior = row - 1, 1, -1 do
+            local parent, isGroup = identity(rows[prior])
+            if parent == nil then break end
+            if isGroup then
+                if saved.groups[parent] then return value end
+                break
+            end
+        end
     end
     return nil
 end
@@ -70,7 +108,7 @@ local function restore(pane, selected, saved, actualRows)
     pane.firstSelect = nil
     if saved.joyAnchor ~= nil then pane.joyselection = -1 end
     for row, value in ipairs(pane.items or {}) do
-        if selectedValue(saved, value) then selected[row] = value end
+        selected[row] = selectedValue(saved, pane.items, row)
         local id, group = identity(value)
         if saved.anchor ~= nil and id == saved.anchor and group == saved.anchorGroup then
             pane.firstSelect = row
@@ -103,12 +141,6 @@ local function finalise(pane)
     elseif type(pane.refreshContainer) == "function" then
         pane:refreshContainer()
     end
-end
-
-local function reviewedCleanUI()
-    if not getModInfoByID then return false end
-    local info = getModInfoByID("CleanUI") or getModInfoByID("\\CleanUI")
-    return info and info.getModVersion and tostring(info:getModVersion()) == "2.10.4"
 end
 
 local function presentationViews(pane)
@@ -182,8 +214,13 @@ end
 
 local stackInputSources = {
     { "CleanUI", "2.10.4", "isui/isinventorypane.lua" },
+    { "CleanUI", "2.10.5", "isui/isinventorypane.lua" },
     { "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua" },
+    { "SuQingUIInteractionFixes", "1.0.2", "suqing_proximityselectionfix.lua" },
+    { "SuQingUIInteractionFixes", "1.0.3", "suqing_proximityselectionfix.lua" },
     { "Codex_InventoryTransferPerformance_4221", "1.2.2", "codex_inventorytransferperformance.lua" },
+    { "Codex_InventoryTransferPerformance_4221", "1.2.3", "codex_inventorytransferperformance.lua" },
+    { "Codex_InventoryTransferPerformance_4221", "1.2.4", "codex_inventorytransferperformance.lua" },
 }
 local observedInputs = {}
 
@@ -199,7 +236,7 @@ local function reviewedStackInput(fn)
         for _, entry in ipairs(stackInputSources) do
             local id, version, file = entry[1], entry[2], entry[3]
             local info = getModInfoByID(id) or getModInfoByID("\\" .. id)
-            if info and tostring(info:getModVersion()) == version then
+            if info and tostring(info:getModVersion()) == version and (id ~= "CleanUI" or reviewedCleanUI(info)) then
                 local directory = normalizedPath(info:getVersionDir())
                 if directory and source == directory .. "/media/lua/client/" .. file then return true end
             end
@@ -255,12 +292,23 @@ end
 
 local function reviewedSelectionBridge(pane)
     local bridge = SuQingUIInteractionFixes and SuQingUIInteractionFixes.proximitySelection
-    return bridge and bridge.version == "1.0.1" and bridge.installed == true and bridge.enabled == true
+    return bridge and (bridge.version == "1.0.1" or bridge.version == "1.0.2" or bridge.version == "1.0.3")
+        and bridge.installed == true and bridge.enabled == true
         and not pane.doController and pane.inventory and pane.inventory.getType
         and pane.inventory:getType() == "proxInv"
 end
 
-local function partition(list, state, nativeRows)
+local PREVIEW_ORDER_INTERVAL_MS = 120
+
+local function hasMatch(row, matches)
+    if not row.items then return matches[row] end
+    for _, item in ipairs(row.items) do
+        if matches[item] then return true end
+    end
+    return false
+end
+
+local function partition(list, matches, nativeRows)
     if type(list) ~= "table" then return false end
     local ordered, hits, misses = {}, {}, {}
     local removeKnownSeparator = reviewedCleanUI()
@@ -278,8 +326,7 @@ local function partition(list, state, nativeRows)
                 ordered[#ordered + 1] = row
             end
         else
-            local count = SQ.rowCount(row, state)
-            local target = count > 0 and hits or misses
+            local target = hasMatch(row, matches) and hits or misses
             target[#target + 1] = row
         end
     end
@@ -296,10 +343,10 @@ local function partition(list, state, nativeRows)
     return changed
 end
 
-local function partitionViews(pane, state, native)
+local function partitionViews(pane, matches, native)
     local changed = false
     for _, list in ipairs(presentationViews(pane)) do
-        if partition(list, state, native and native.rows[list]) then changed = true end
+        if partition(list, matches, native and native.rows[list]) then changed = true end
     end
     return changed
 end
@@ -357,7 +404,10 @@ function M.render(pane, state, doDragged, original, ...)
 
     local compiled = state and state.compiled
     local enabled = not SQ.getOptions or SQ.getOptions().sortMatches ~= false
-    local active = enabled and state and state.ready == true and compiled
+    local preview = state and state.preview
+    local previewHits = preview and (preview.virtualSources[pane.inventory] and preview.total
+        or preview.counts[pane.inventory] or 0)
+    local active = enabled and state and (state.ready == true or (previewHits and previewHits > 0)) and compiled
         and compiled.active == true and not compiled.errorKey
     local stackToggle = active and pending and record.active and not record.invalid
         and record.revision == state.revision and record.inventory == pane.inventory
@@ -374,7 +424,11 @@ function M.render(pane, state, doDragged, original, ...)
     local sameView = record and not record.invalid and record.inventory == pane.inventory
         and record.list == pane.itemslist and record.generation == pane.refreshContainerCount
         and record.sort == pane.itemSortFunc and not dirty(pane) and samePresentation(pane, record)
+    -- Paint new hits every slice, but coalesce reordering for a stable view.
+    -- A pane's first hits and the final result bypass the interval.
     local cached = active and sameView and record.active and record.revision == state.revision
+        and (record.previewHits == previewHits or (preview and record.previewOrderAt
+            and getTimestampMs() < record.previewOrderAt))
     local reuse = not cached and sameView and reuseNative(pane, record)
 
     record = record or {}
@@ -409,8 +463,9 @@ function M.render(pane, state, doDragged, original, ...)
     end
 
     local changed = false
+    local matches = active and (preview or state).matches
     if active and not cached then
-        ok, changed = pcall(partitionViews, pane, state, reuse and record.native)
+        ok, changed = pcall(partitionViews, pane, matches, reuse and record.native)
         if not ok then
             record.busy = false
             if pane.selected == selected then restore(pane, selected, saved, false) end
@@ -431,7 +486,7 @@ function M.render(pane, state, doDragged, original, ...)
         if useBridge or shadow or pane.selected ~= selected then return end
         table.wipe(selected)
         shadow = {
-            __index = function(_, row) return selectedValue(saved, pane.items and pane.items[row]) end,
+            __index = function(_, row) return selectedValue(saved, pane.items, row) end,
             __newindex = function(t, key, value)
                 if type(key) ~= "number" then rawset(t, key, value) end
             end,
@@ -456,7 +511,7 @@ function M.render(pane, state, doDragged, original, ...)
                 -- Capture only the last completed native rebuild, before
                 -- enhanced rows change their order again.
                 rememberNative(pane, record, pane.refreshContainerCount ~= generation, nativeRefresh)
-                if partitionViews(pane, state) then
+                if partitionViews(pane, matches) then
                     changed, record.ordered = true, true
                 end
                 if record.native then rememberPresentation(pane, record) end
@@ -479,6 +534,10 @@ function M.render(pane, state, doDragged, original, ...)
 
     record.active, record.ordered, record.invalid = active, active and (record.ordered or changed), false
     record.revision = state and state.revision
+    if not cached or refreshed then
+        record.previewHits = active and previewHits or nil
+        record.previewOrderAt = record.previewHits and (getTimestampMs() + PREVIEW_ORDER_INTERVAL_MS) or nil
+    end
     record.query, record.category = state and state.query or "", state and state.category or ""
     record.inventory, record.list, record.generation, record.sort = pane.inventory,
         pane.itemslist, pane.refreshContainerCount, pane.itemSortFunc

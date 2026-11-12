@@ -19,12 +19,12 @@ F8 打开增强面板，选择随身／附近。八项个人选项位于“设�
 
 [b]可选适配与范围[/b]
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657184750]拼音搜索（yxjs_PinYinSearch 1.3）[/url]：复用全拼、首字母及多音字候选。NIUROUBING／NRB 可搜牛肉饼，M110BQ 可搜 M110 步枪；受上游词典限制，本包不包含该代码或词典。
-[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3437629766]CleanUI 2.10.4[/url]：接入原框，保留类别，面板与原框同步文字和范围。其他 UI 可用 F8，专有原框需适配。
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3437629766]CleanUI 2.10.4 / 2.10.5[/url]：接入原框，保留类别，面板与原框同步文字和范围。其他 UI 可用 F8，专有原框需适配。
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2847184718]Proximity Inventory[/url]：投影已列出、可读的真实来源，逐实例去重。以上均为可选。
-目标 B42.21 单人，详细列表已适配，图标网格未适配。随身只读 UI 已列出的主包／随身包；附近只读当前可访问、已探索容器及可见地面。不扫描世界、不探索容器、不生成物资。不改物品和存档结构，查询仅本次会话有效。正常退出、停用并重启后结束 UI 功能；手动版与工坊版共用 Mod ID，只保留一种加载来源。
+适用 B42.21.0 和 B42.22.2 单人，详细列表已适配，图标网格未适配。随身只读 UI 已列出的主包／随身包；附近只读当前可访问、已探索容器及可见地面。不扫描世界、不探索容器、不生成物资。不改物品和存档结构，查询仅本次会话有效。正常退出、停用并重启后结束 UI 功能；手动版与工坊版共用 Mod ID，只保留一种加载来源。
 
 [b]验证与素材[/b]
-0.1.3 将搜索扫描分摊到多帧，复用文字和拼音结果，拼音缓存逐项淘汰。CleanUI 中展开或折叠命中堆叠时保持置顶。用户于 2026-11-08 在本机 B42.21 单人档确认原卡顿消失，展开和折叠恢复正常。1,253 条离线断言通过。
+0.1.4-rc.3 适配 CleanUI 2.10.5，恢复搜索行复用及展开、折叠匹配堆叠时的置顶，保留选区和 Shift 锚点。首批命中在分帧扫描结束前显示。B42.21.0 与 B42.22.2 各通过 1,302 条离线断言，游戏内待验收。
 封面与独立透明 icon 使用 AI 辅助制作，人物不是游戏内皮肤／服装。感谢可选适配作者，上游权利归原作者。
 
 [h2]English[/h2]
@@ -46,12 +46,12 @@ Names, type names and source display names ignore ASCII case and tolerate whites
 
 [b]Optional integrations and scope[/b]
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3657184750]Pinyin Search (yxjs_PinYinSearch 1.3)[/url]: full spelling, initials and polyphonic alternatives, limited by its dictionary. NIUROUBING/NRB can find 牛肉饼; M110BQ can find M110 步枪. Its code/dictionary are not bundled.
-[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3437629766]CleanUI 2.10.4[/url]: field integration retains categories and synchronizes text/scope. Other UIs can use F8; custom fields require adapters.
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3437629766]CleanUI 2.10.4 / 2.10.5[/url]: field integration retains categories and synchronizes text/scope. Other UIs can use F8; custom fields require adapters.
 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2847184718]Proximity Inventory[/url]: listed, readable physical sources with instance-based deduplication. All integrations are optional.
-Targets B42.21 single-player detailed lists; icon grids are not adapted. Carried reads listed inventory/bags; Nearby reads accessible, explored containers and visible floor items. No world scanning, exploration or loot generation. Items/save structures are unchanged; queries are session-only. Exit normally, disable and restart to remove UI behavior. Manual/Workshop copies share one Mod ID; keep one loading source.
+Supports B42.21.0 and B42.22.2 single-player detailed lists; icon grids are not adapted. Carried reads listed inventory/bags; Nearby reads accessible, explored containers and visible floor items. No world scanning, exploration or loot generation. Items/save structures are unchanged; queries are session-only. Exit normally, disable and restart to remove UI behavior. Manual/Workshop copies share one Mod ID; keep one loading source.
 
 [b]Validation and assets[/b]
-Version 0.1.3 spreads scans across frames, reuses text and pinyin results, and evicts pinyin cache entries individually. Matching stacks stay prioritized when expanded or collapsed in CleanUI. On 2026-11-08 the user confirmed the reported hitch was gone and stack toggles worked normally in their local B42.21 single-player save. All 1,253 offline assertions passed.
+Version 0.1.4-rc.3 restores row reuse and priority when toggling matching stacks in CleanUI 2.10.5, with selection and Shift anchors preserved. The first hits appear before the scan completes. B42.21.0 and B42.22.2 each passed 1,302 offline assertions. In-game testing is pending.
 Cover/separate transparent icon use AI-assisted artwork; the character is not an in-game skin/outfit. Thanks to integration authors; upstream rights remain theirs.
 
 Mod ID: SuQingSearchEnhancement

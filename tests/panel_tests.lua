@@ -130,10 +130,28 @@ equal(panel.calls[#panel.calls].text, "UI_SQSearch_ErrorUnclosedQuote", "render 
 panel:clear()
 panel:render()
 equal(panel.calls[#panel.calls].text, "UI_SQSearch_Empty", "render reports empty state")
+local inventoryItems = {}
+for index = 1, 120 do
+    inventoryItems[index] = index <= 7 and M.item("Rifle", "Base.Rifle") or M.item("Rag", "Base.Rag")
+end
+local inventoryPage = M.page(true, {M.container("bag", inventoryItems, true)})
+M.inventories[0] = inventoryPage
+SQ.registerPage(inventoryPage)
 panel.entry:setText("rifle")
-SQ.getState(0, panel.scope).total = 7
+panel:render()
+equal(panel.calls[#panel.calls].text, "UI_SQSearch_Searching", "render reports searching before the first slice")
+M.advance(120)
+panel:render()
+equal(panel.calls[#panel.calls].text, "UI_SQSearch_Searching", "render reports searching while scan is incomplete")
+M.advance(16)
 panel:render()
 equal(panel.calls[#panel.calls].text, "UI_SQSearch_Count:7", "render reports numeric result count")
+panel.entry:setText("no-match")
+M.advance(120)
+M.advance(16)
+panel:render()
+equal(panel.calls[#panel.calls].text, "UI_SQSearch_Count:0", "render reports zero matches once scan completes")
+M.inventories[0] = nil
 equal(panel.inventoryButton.borderColor.a, 1, "active scope visual")
 equal(panel.nearbyButton.borderColor.a, 0.3, "inactive scope visual")
 equal(panel:isKeyConsumed(Keyboard.KEY_ESCAPE), true, "escape consumed by panel")

@@ -42,17 +42,21 @@ end
 function SQ.markDirty()
     local dueAt = now() + REFRESH_DELAY_MS
     for _, states in pairs(SQ.states) do
-        for _, state in pairs(states) do markStateDirty(state, dueAt) end
+        for _, state in pairs(states) do
+            if state.scan and not state.ready then state.scan.checkContents = true end
+            markStateDirty(state, dueAt)
+        end
     end
 end
 
 local function clearResults(state)
     state.ready, state.sources = false, nil
+    state.preview = nil
     state.matches, state.counts, state.total = {}, {}, 0
 end
 
 local function invalidateResults(state)
-    if state.ready then
+    if state.ready or state.preview then
         clearResults(state)
         state.revision = state.revision + 1
     end
@@ -142,9 +146,12 @@ local function newScan(page, sources, state)
         unknownNames = {"unknown", "\230\156\170\231\159\165", getText("UI_SQSearch_Unknown")},
         scanTextMatcher = state.matchText,
     }
+    local virtualSources = {}
+    for index = sources.physicalCount + 1, #sources do virtualSources[sources[index]] = true end
     return {
         page = page, sources = sources, pinyin = pinyin, options = options,
         snapshots = {}, sourceIndex = 1, matches = {}, counts = {}, seenItems = {}, total = 0,
+        virtualSources = virtualSources,
     }
 end
 
@@ -187,6 +194,19 @@ local function advanceScan(scan, state, work)
     return scan.sourceIndex > #scan.sources
 end
 
+local function sameContents(scan)
+    for index, snapshot in ipairs(scan.snapshots) do
+        -- Native comparison also catches same-size replacement and reorder.
+        if not snapshot:equals(scan.sources[index]:getItems()) then return false end
+    end
+    return true
+end
+
+local function retryScan(state)
+    if state.preview then invalidateResults(state) end
+    state.scan, state.dueAt = nil, now()
+end
+
 function SQ.refreshPage(page, work)
     if not page.inventoryPane then return end
     local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
@@ -201,7 +221,19 @@ function SQ.refreshPage(page, work)
         state.scan = newScan(page, sources, state)
     end
     local scan = state.scan
-    if not advanceScan(scan, state, work) then return end
+    if scan.checkContents then
+        scan.checkContents = nil
+        if scan.pinyin ~= (SQ.getOptions().pinyin == true) or not sameContents(scan) then
+            retryScan(state)
+            return
+        end
+    end
+    if not advanceScan(scan, state, work) then
+        -- Keep the provisional matches separate from the last complete result.
+        -- A periodic refresh can continue to display that complete result.
+        if not state.ready and scan.total > 0 then state.preview = scan end
+        return
+    end
     state.scan = nil
     if not sameSources(scan.sources, getSources(page))
         or scan.pinyin ~= (SQ.getOptions().pinyin == true) then
@@ -209,18 +241,18 @@ function SQ.refreshPage(page, work)
         state.dueAt = now()
         return
     end
-    for i, container in ipairs(scan.sources) do
-        -- Native list comparison catches even same-size replacement or reorder.
-        if not scan.snapshots[i]:equals(container:getItems()) then
-            state.dueAt = now()
-            return
-        end
+    if not sameContents(scan) then
+        retryScan(state)
+        return
     end
-    if scan.changed or state.total ~= scan.total or not state.ready then
+    -- Finishing a preview keeps the same ordering session, including a stack
+    -- toggle in flight. Ordering flushes the final batch when preview ends.
+    if not state.preview and (scan.changed or state.total ~= scan.total or not state.ready) then
         state.revision = state.revision + 1
     end
     state.matches, state.counts, state.total = scan.matches, scan.counts, scan.total
     state.sources = scan.sources
+    state.preview = nil
     state.ready = true
     state.auditAt = now() + AUDIT_INTERVAL_MS
 end
@@ -242,7 +274,8 @@ function SQ.drawMatches(pane, doDragged)
     if doDragged or not pane.parent or not pane.items then return end
     local page = pane.parent
     local state = SQ.getState(pane.player, page.onCharacter and "inventory" or "nearby")
-    if not state.ready or state.total == 0 then return end
+    local results = state.preview or state
+    if (not state.ready and not state.preview) or results.total == 0 then return end
     local header, rowHeight = pane.headerHgt, pane.itemHgt
     if rowHeight <= 0 then return end
     local scrollWidth = 0
@@ -277,7 +310,7 @@ function SQ.drawMatches(pane, doDragged)
         end
         local y = (index - 1) * rowHeight + header + scroll
         if y + rowHeight > header and y < height then
-            local count, total = SQ.rowCount(row, state)
+            local count, total = SQ.rowCount(row, results)
             local dragged = pane.dragging ~= nil and pane.dragStarted and pane.selected and pane.selected[index]
             if count > 0 and not dragged then
                 local top, bottom = math.max(header, y), math.min(height, y + rowHeight)
@@ -308,7 +341,7 @@ local function decorateButton(button, page)
     button.render = function(self)
         if render then render(self) end
         local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
-        local count = state.counts[self.inventory] or 0
+        local count = (state.preview or state).counts[self.inventory] or 0
         if count > 0 then
             self:drawRectBorder(0, 0, self.width, self.height, 1, 0.82, 0.65, 1)
             if SQ.getOptions().showCounts then
@@ -326,7 +359,10 @@ function SQ.registerPage(page)
     local state = SQ.getState(page.player, page.onCharacter and "inventory" or "nearby")
     if state.page == page and (state.scan or state.ready) then
         local sources = getSources(page)
-        if state.scan and not sameSources(state.scan.sources, sources) then state.scan = nil end
+        if state.scan and not sameSources(state.scan.sources, sources) then
+            state.scan = nil
+            if state.preview then invalidateResults(state) end
+        end
         if state.ready and not sameSources(state.sources, sources) then invalidateResults(state) end
     end
     markStateDirty(state, now() + REFRESH_DELAY_MS)

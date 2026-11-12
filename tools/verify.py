@@ -1,5 +1,6 @@
 """Offline checks using PZ's standalone compiler and mock regression suites."""
 from datetime import datetime
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -9,16 +10,11 @@ import subprocess
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-GAME = ROOT.parents[1]
 MOD = ROOT / "mods/SuQingSearchEnhancement/42"
 LUA = MOD / "media/lua"
 TESTS = ROOT / "tests"
 OUT = ROOT / "validation"
 JAVAC = Path(r"E:\code\java-1.8.0-openjdk-1.8.0.392-1.b08.redhat.windows.x86_64\bin\javac.exe")
-JAVA = GAME / "jre64/bin/java.exe"
-LAUNCHER = json.loads((GAME / "ProjectZomboid64.json").read_text(encoding="utf-8-sig"))
-RUNTIME_CLASSPATH = [GAME / entry for entry in LAUNCHER["classpath"]]
-CLASSPATH = ";".join(str(path) for path in [OUT, *RUNTIME_CLASSPATH])
 
 
 def run(label, arguments):
@@ -43,19 +39,31 @@ def lua_string(value):
     return '"' + "".join("\\" + str(byte).zfill(3) for byte in value.encode("utf-8")) + '"'
 
 
-def cleanui_release_fixture():
+def cleanui_release_fixture(game_version):
     # This is an explicitly reviewed upstream fixture, not a generic CleanUI
     # compatibility claim. Re-review its handlers if the branch/version/hash
     # changes; failing here prevents a passing mock from masking upstream drift.
-    branch = GAME.parent.parent / "workshop/content/108600/3437629766/mods/CleanUI/42.19"
+    branch_name = {"42.21.0": "42.19", "42.22.2": "42.22"}[game_version.split()[0]]
+    branch = GAME.parent.parent / "workshop/content/108600/3437629766/mods/CleanUI" / branch_name
     source = branch / "media/lua/client/ISUI/ISInventoryPane.lua"
+    search_handler = source.parent / "CommonHandler/InventorySearch.lua"
     info = (branch / "mod.info").read_text(encoding="utf-8-sig")
     version = re.search(r"^modversion=(.+)$", info, re.MULTILINE).group(1).strip()
-    assert version == "2.10.4", "CleanUI release fixture requires a new source review: version changed"
+    reviewed_panes = {
+        ("42.19", "2.10.4"): "b0de68c2766c29ef26d001a20ba42e8fe17176b77eeaed1c73035b0e8e7ac06e",
+        ("42.22", "2.10.4"): "257448f465e4a5f31fa211d0e2fe75670d75c897c82b3ef8782135261709025f",
+        ("42.19", "2.10.5"): "7d91f99918dd51a3c72cbae8916f053638e576691cf9d112a11f5a47815917f8",
+        ("42.22", "2.10.5"): "34e7b696f17417b0e93cbb6b4d31e49b70bf5d2efa9e7975b362dd42df32ca0a",
+    }
+    reviewed_search_handlers = {
+        "42.19": "c4ce5c0d7d8c3da1b61d7783ff3cd62c6bec2b3ac5e4b6e698d3b12529454c23",
+        "42.22": "23e208c66901390befa9952d65c51ec008ae3dc1e5056fbd27d6669f597108af",
+    }
     raw = source.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
-    reviewed = "b0de68c2766c29ef26d001a20ba42e8fe17176b77eeaed1c73035b0e8e7ac06e"
-    assert digest == reviewed, "CleanUI release fixture requires a new source review: upstream file changed"
+    handler_digest = hashlib.sha256(search_handler.read_bytes()).hexdigest()
+    assert digest == reviewed_panes.get((branch_name, version)), "Review CleanUI branch, version and inventory pane before testing"
+    assert handler_digest == reviewed_search_handlers[branch_name], "Review the CleanUI search handler before testing"
     text = raw.decode("utf-8-sig")
     parts, methods = [], []
     boundaries = [
@@ -84,14 +92,38 @@ def cleanui_release_fixture():
                         "sha256": hashlib.sha256(body.encode("utf-8")).hexdigest()})
     fixture = OUT / "cleanui_release_fixture.lua"
     fixture.write_text("-- Generated from the reviewed current CleanUI source.\n"
-                       "CleanUIReleaseFixture = true\n" + "\n\n".join(parts) + "\n", encoding="utf-8")
-    return fixture, {"path": str(source), "branch": "42.19", "version": version, "sha256": digest,
+                       f"CleanUIReleaseFixture = true\nCleanUIReleaseBranch = {json.dumps(branch_name)}\n"
+                       f"CleanUIReleaseVersion = {json.dumps(version)}\n" + "\n\n".join(parts) + "\n", encoding="utf-8")
+    return fixture, {"path": str(source), "branch": branch_name, "version": version, "sha256": digest,
+                     "search_handler": {"path": str(search_handler), "sha256": handler_digest},
                      "methods": methods, "fixture_sha256": hashlib.sha256(fixture.read_bytes()).hexdigest(),
                      "review_policy": "re-review branch, version and source hash before accepting upstream changes"}
 
 
 def main():
-    OUT.mkdir(exist_ok=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", type=Path, default=OUT)
+    parser.add_argument("--game-dir", type=Path, default=ROOT.parents[1])
+    parser.add_argument("--game-jar", type=Path)
+    source_patch = Path(r"E:\code\suqing-project-zomboid-patches\src\SuQingUIInteractionFixes\42\media\lua\client\SuQing_ProximitySelectionFix.lua")
+    parser.add_argument("--interaction-patch", type=Path, default=source_patch if source_patch.is_file() else Path(
+        r"C:\Users\15792\Zomboid\mods\SuQingUIInteractionFixes\42\media\lua\client\SuQing_ProximitySelectionFix.lua"))
+    args = parser.parse_args()
+    game_dir = args.game_dir.resolve()
+    game_jar = args.game_jar or game_dir / "projectzomboid.jar"
+    run_verification(args.output.resolve(), game_dir, game_jar.resolve(), args.interaction_patch.resolve())
+
+
+def run_verification(output, game_dir, game_jar, interaction_patch):
+    global OUT, GAME, JAVA, RUNTIME_CLASSPATH, CLASSPATH
+    OUT = output
+    GAME = game_dir
+    JAVA = GAME / "jre64/bin/java.exe"
+    launcher = json.loads((GAME / "ProjectZomboid64.json").read_text(encoding="utf-8-sig"))
+    RUNTIME_CLASSPATH = [GAME / entry for entry in launcher["classpath"]]
+    RUNTIME_CLASSPATH = [game_jar if path.name == "projectzomboid.jar" else path for path in RUNTIME_CLASSPATH]
+    CLASSPATH = ";".join(str(path) for path in [OUT, *RUNTIME_CLASSPATH])
+    OUT.mkdir(parents=True, exist_ok=True)
     run("java_compile", [JAVAC, "-encoding", "UTF-8", "-d", OUT,
                          ROOT / "tools/LuaCheck.java", ROOT / "tools/SandboxNativeProbe.java"])
     files = sorted(LUA.rglob("*.lua"))
@@ -121,10 +153,10 @@ def main():
     logs["settings"] = execute("settings", [TESTS / "runtime_bootstrap.lua", TESTS / "panel_bootstrap.lua",
                       GAME / "media/lua/client/PZAPI/ModOptions.lua", core,
                       LUA / "client/SuQingSearch/Settings.lua", TESTS / "settings_tests.lua"])
-    interaction_patch = Path(r"C:\Users\15792\Zomboid\mods\SuQingUIInteractionFixes\42\media\lua\client\SuQing_ProximitySelectionFix.lua")
     logs["ordering"] = execute("ordering", [TESTS / "ordering_bootstrap.lua", interaction_patch,
                                            LUA / "client/SuQingSearch/Ordering.lua", TESTS / "ordering_tests.lua"])
-    release_fixture, release_source = cleanui_release_fixture()
+    game_version = re.search(r"NATIVE_GAME version=(.+)", logs["sandbox_native"]).group(1).strip()
+    release_fixture, release_source = cleanui_release_fixture(game_version)
     logs["ordering_drag_release"] = execute("ordering_drag_release", [TESTS / "ordering_bootstrap.lua",
                      LUA / "client/SuQingSearch/Ordering.lua", release_fixture, interaction_patch,
                      TESTS / "ordering_drag_release_tests.lua"])
@@ -178,10 +210,14 @@ def main():
         cases = re.search(r"cases=(\d+)", log)
         if cases:
             regression[name]["cases"] = int(cases.group(1))
+    classpath_files = [
+        {"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        for path in RUNTIME_CLASSPATH if path.is_file()
+    ]
     summary = {"result": "PASS", "checked_at": datetime.now().astimezone().isoformat(),
-               "game_version": re.search(r"NATIVE_GAME version=(.+)", logs["sandbox_native"]).group(1).strip(),
+               "game_version": game_version,
                "lua_product_files": len(files),
-               "runtime_classpath": [{"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in RUNTIME_CLASSPATH],
+               "runtime_classpath": classpath_files,
                "regression": regression,
                "assertions": sum(item["assertions"] for item in regression.values()),
                "ordering_compatibility_source": {"path": str(interaction_patch),

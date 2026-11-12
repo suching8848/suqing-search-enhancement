@@ -355,18 +355,41 @@ for index = 1, 240 do many[index] = M.item("Bolt", "Base.Bolt") end
 local manyContainer = M.container("crate", many, true)
 local manyVirtual = M.container("proxInv", many, true)
 local manyPage = M.page(false, {manyContainer, manyVirtual})
+local manyPane = manyPage.inventoryPane
+manyPane.inventory = manyContainer
+local function highlightedRows()
+    manyPane.calls = {}
+    SQ.drawMatches(manyPane, false)
+    local highlighted = {}
+    for _, call in ipairs(manyPane.calls) do
+        if call.kind == "border-static" then
+            highlighted[(call.args[2] - manyPane.headerHgt) / manyPane.itemHgt + 1] = true
+        end
+    end
+    return highlighted
+end
 M.loot[0] = manyPage
 SQ.registerPage(manyPage)
 SQ.setQuery(0, "bolt", "nearby")
+local replaced = many[1]
+manyPane.items = {replaced, many[100], many[240], virtualOnly}
 M.advance(120)
 local manyState = state(manyPage)
 equal(manyState.ready, false, "a large query yields after its first slice")
-equal(manyState.total, 0, "partial matches never publish")
-local replaced = many[1]
+local highlighted = highlightedRows()
+equal(highlighted[1], true, "first slice highlights a match before the full result is ready")
+equal(highlighted[2], nil, "first slice does not highlight unscanned items")
+equal(highlighted[4], nil, "first slice does not highlight an unrelated row")
+M.advance(16)
+equal(manyState.ready, false, "the next slice still has more work")
+highlighted = highlightedRows()
+equal(highlighted[1], true, "later slices retain earlier highlights")
+equal(highlighted[2], true, "later slices add new highlights before the full result is ready")
+equal(highlighted[3], nil, "the last item is still unscanned")
 many[1] = M.item("Washer", "Base.Washer")
-for _ = 1, 5 do M.advance(16) end
+for _ = 1, 4 do M.advance(16) end
 equal(manyState.ready, false, "same-size replacement invalidates the completed snapshot")
-equal(manyState.matches[replaced], nil, "replaced item never publishes")
+equal(highlightedRows()[1], nil, "invalidated preview stops highlighting the replaced item")
 for _ = 1, 10 do
     M.emit("OnContainerUpdate")
     M.advance(16)
@@ -374,6 +397,9 @@ end
 equal(manyState.ready, true, "event bursts cannot restart a valid running scan")
 equal(manyState.total, 239, "retry publishes the current physical items")
 equal(manyState.counts[manyVirtual], 239, "virtual scan follows the current physical snapshot")
+highlighted = highlightedRows()
+equal(highlighted[1], nil, "validated results exclude the removed match")
+equal(highlighted[3], true, "validated results include the last match")
 
 manyContainer.locked = true
 M.emit("OnRefreshInventoryWindowContainers", manyPage, "end")
@@ -381,9 +407,20 @@ equal(manyState.total, 0, "source losing access immediately clears its old hits"
 M.advance(120)
 equal(manyState.total, 0, "virtual membership does not reveal locked sources")
 manyContainer.locked = false
-SQ.setQuery(0, "bolt washer", "nearby")
+manyPane.items = {many[1], many[2]}
+SQ.setQuery(0, "bolt -never", "nearby")
 M.advance(120)
+equal(highlightedRows()[2], true, "old query has a visible preview before replacement")
+local moved = many[2]
+many[2] = M.item("Bolt", "Base.Bolt")
+M.emit("OnContainerUpdate")
+M.advance(16)
+equal(firstKey(highlightedRows()), nil, "container event validates and clears the changed preview on the next tick")
+many[2] = moved
+M.advance(16)
+equal(highlightedRows()[2], true, "a clean retry may publish another preview")
 SQ.setQuery(0, "washer", "nearby")
+equal(firstKey(highlightedRows()), nil, "a new query clears the previous preview before scanning")
 M.advance(120)
 for _ = 1, 5 do M.advance(16) end
 equal(manyState.total, 1, "a new query cancels the old scan")
@@ -403,6 +440,34 @@ manyPage.visible = false
 M.advance(16)
 equal(manyState.scan, nil, "hidden pages discard unfinished work")
 equal(manyState.ready, false, "hidden page cannot publish results")
+equal(firstKey(highlightedRows()), nil, "hidden pages discard preview highlights")
+
+case()
+SQ.setQuery(0, "bolt | washer", "inventory")
+local originalMatches, matchCalls = SQ.Core.matches, 0
+SQ.Core.matches = function(...)
+    matchCalls = matchCalls + 1
+    M.time = M.time + 1
+    return originalMatches(...)
+end
+M.advance(120)
+SQ.Core.matches = originalMatches
+equal(matchCalls, 2, "a slow first scan slice yields at the elapsed-time budget")
+equal(state(ownMany).ready, false, "a slow slice does not finish the query synchronously")
+SQ.clearQuery(0, "inventory")
+
+case()
+local originalLateItem = many[100]
+many[100] = M.item("Wrench", "Base.Wrench")
+SQ.setQuery(0, "wrench", "inventory")
+M.advance(120)
+equal(state(ownMany).scan ~= nil, true, "scan remains in progress before the first hit")
+equal(state(ownMany).preview, nil, "a slice without matches does not publish a preview")
+many[100] = originalLateItem
+M.emit("OnContainerUpdate")
+M.advance(16)
+equal(state(ownMany).preview, nil, "an event invalidates the stale snapshot before its first hit can publish")
+SQ.clearQuery(0, "inventory")
 
 case()
 local transferred = M.item("Bolt", "Base.Bolt")

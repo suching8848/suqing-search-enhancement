@@ -102,9 +102,18 @@ local function reviewedSource(fn, id, version, file)
     if type(fn) ~= "function" or not getFilenameOfClosure or not getModInfoByID then return false end
     local ok, matches = pcall(function()
         local info = getModInfoByID(id) or getModInfoByID("\\" .. id)
-        if not info or tostring(info:getModVersion()) ~= version then return false end
+        if not info then return false end
+        local actualVersion = tostring(info:getModVersion())
         local directory = normalizedPath(info:getVersionDir())
-        return directory ~= nil and normalizedPath(getFilenameOfClosure(fn)) == directory .. "/media/lua/client/" .. file
+        if not directory then return false end
+        if id == "CleanUI" then
+            local reviewed2105 = actualVersion == "2.10.5" and not CleanUI_SnakeUtilsRenderCompatInstalled
+                and (directory:match("/42%.19$") or directory:match("/42%.22$"))
+            if actualVersion ~= "2.10.4" and not reviewed2105 then return false end
+        elseif actualVersion ~= version then
+            return false
+        end
+        return normalizedPath(getFilenameOfClosure(fn)) == directory .. "/media/lua/client/" .. file
     end)
     return ok and matches == true
 end
@@ -112,20 +121,24 @@ end
 function M.reviewedNativeSearch(pane, refresh)
     local search = pane.searchContainer
     refresh = refresh or pane.refreshContainer
-    return (reviewedSource(search, "CleanUI", "2.10.4", cleanPane)
+    return (reviewedSource(search, "CleanUI", nil, cleanPane)
             or reviewedSource(search, pinyinID, "1.1", pinyinFile))
-        and (reviewedSource(refresh, "CleanUI", "2.10.4", cleanPane)
+        and (reviewedSource(refresh, "CleanUI", nil, cleanPane)
             or reviewedSource(refresh, pinyinID, "1.1", pinyinFile)
             or reviewedSource(refresh, "NeatUI_Equipment", "1.0.2", "neatequipment/patches/neq_hideequipped.lua")
             or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.2", "codex_inventorytransferperformance.lua")
-            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua"))
+            or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.3", "codex_inventorytransferperformance.lua")
+            or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.4", "codex_inventorytransferperformance.lua")
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua")
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.2", "suqing_proximityselectionfix.lua")
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.3", "suqing_proximityselectionfix.lua"))
 end
 
 local function withCategoryOnly(handler, original, category, ...)
     local _, _, window = contextFor(handler)
     local pane = window and window.inventoryPane
     if pane and M.reviewedNativeSearch(pane)
-        and reviewedSource(original, "CleanUI", "2.10.4", "isui/commonhandler/inventorysearch.lua") then
+        and reviewedSource(original, "CleanUI", nil, "isui/commonhandler/inventorysearch.lua") then
         -- Let CleanUI read the actual field for clear-button visibility. Only
         -- the name sent to its inventory search is owned by our matcher.
         local previous = ownSlot(pane, "searchContainer")

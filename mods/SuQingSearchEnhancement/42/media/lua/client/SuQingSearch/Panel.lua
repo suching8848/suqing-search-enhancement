@@ -110,6 +110,8 @@ function Panel:render()
     elseif not state.compiled.active then
         message = getText((self.entry:getInternalText() ~= "" or self.category ~= "")
             and "UI_SQSearch_Native" or "UI_SQSearch_Empty")
+    elseif not state.ready then
+        message = getText("UI_SQSearch_Searching")
     else
         message = getText("UI_SQSearch_Count", tostring(state.total))
     end

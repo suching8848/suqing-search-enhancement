@@ -2,12 +2,12 @@
   "title_cn": "蘇清的搜索增强",
   "title_en": "SuQing's Search Enhancement",
   "mod_id": "SuQingSearchEnhancement",
-  "version": "0.1.3",
+  "version": "0.1.4-rc.3",
   "source": ".",
   "required_mods": [],
   "native_api": "PZAPI/ModOptions",
   "optional_integrations": [
-    "CleanUI 2.10.4",
+    "CleanUI 2.10.4/2.10.5",
     "yxjs_PinYinSearch 1.3",
     "ProximityInventory"
   ],
@@ -27,7 +27,25 @@
       "result": "Reported search hitch no longer reproduced; list flickered while expanding a matching stack"
     }
   },
-  "state": "0.1.3 released from user-confirmed rc.2 Lua; GitHub main pushed and native Workshop readback verified public",
+  "working_candidate": {
+    "version": "0.1.4-rc.3",
+    "scope": "CleanUI 2.10.5 support on B42.21.0 and B42.22.2",
+    "gameplay_acceptance": "pending",
+    "offline_checks": {
+      "42.21.0": {
+        "assertions": 1302,
+        "checked_at": "2026-11-12T16:24:41.969618+08:00",
+        "game_jar_sha256": "e1a69eb743ede60b213a0fe7f8b83d4fcab773036d256cc4543a336f3b058a33"
+      },
+      "42.22.2": {
+        "assertions": 1302,
+        "checked_at": "2026-11-12T16:24:44.904859+08:00",
+        "game_jar_sha256": "3c4a7c5f149d784758c6fb5f8fa85f3a21d572e38bc081400e89035f8120d287"
+      }
+    },
+    "cleanui_workshop_manifest": "5288503784091482270"
+  },
+  "state": "0.1.4-rc.3 passed offline validation on B42.21.0 and B42.22.2. The personal installation is 0.1.4-rc.2. The published version is 0.1.3.",
   "workshop": "Existing item 3834692575 updated to 0.1.3 and verified public by uncached native readback",
   "git": "Feature commit 9e3db79d28b038ef1149991b8fac63189efef15a pushed to main at https://github.com/suching8848/suqing-search-enhancement",
   "gameplay_acceptance": {
@@ -58,7 +76,7 @@
     }
   },
   "publication_authorized": true,
-  "local_installed_version": "0.1.3-rc.2",
+  "local_installed_version": "0.1.4-rc.2",
   "workshop_staging": "release/0.1.3_20261108/workshop-upload/SuQingSearchEnhancement",
   "release_manifest": "release/0.1.3_20261108/release-manifest.json",
   "release_report": "publishing/发布记录_0.1.3.md",
