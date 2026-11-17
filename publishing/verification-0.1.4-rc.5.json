@@ -1,0 +1,22 @@
+{
+  "item_id": "3834692575",
+  "version": "0.1.4-rc.5",
+  "verified_at_bjt": "2026-11-18T02:57:05.788898+08:00",
+  "visibility": "public",
+  "mod_versions": {
+    "SuQingSearchEnhancement": "0.1.4-rc.5"
+  },
+  "content_tree_sha256": "caaa3d02a20168d50c8b585c3fb83f6a3cc0a4aebbf5fc1389ceba4982bb4d5a",
+  "content_files": 18,
+  "content_bytes": 773706,
+  "checks": {
+    "title": true,
+    "description": true,
+    "metadata": true,
+    "content_bytes": true,
+    "preview_policy": true,
+    "tags": true,
+    "dependencies": true
+  },
+  "verification_scope": "Uncached Steam item metadata, description, size, preview, tags, dependencies and public visibility readback."
+}
