@@ -1,5 +1,11 @@
 # Changes / 更新
 
+## 0.1.4-rc.5 — 2026-11-18
+
+适配 CleanUI 2.10.6 和 2.10.7 的库存搜索、行复用及堆叠置顶。CleanUI 两个已核对的渲染分支各通过 1,316 项离线断言。
+
+Adapts inventory search, row reuse and stack priority to CleanUI 2.10.6 and 2.10.7. Both reviewed CleanUI rendering branches passed 1,316 offline assertions each.
+
 ## 0.1.4-rc.3 · CleanUI 2.10.5
 
 恢复 CleanUI 2.10.5 在 B42.21.0 和 B42.22.2 的搜索行复用与堆叠展开置顶。识别批量转移 1.2.4 和融合选区 1.0.3 的函数来源。两个版本各通过 1,302 条离线断言，游戏内待验收。

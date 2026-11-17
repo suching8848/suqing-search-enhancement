@@ -107,9 +107,10 @@ local function reviewedSource(fn, id, version, file)
         local directory = normalizedPath(info:getVersionDir())
         if not directory then return false end
         if id == "CleanUI" then
-            local reviewed2105 = actualVersion == "2.10.5" and not CleanUI_SnakeUtilsRenderCompatInstalled
+            local reviewedBranch = (actualVersion == "2.10.5" or actualVersion == "2.10.6" or actualVersion == "2.10.7")
+                and not CleanUI_SnakeUtilsRenderCompatInstalled
                 and (directory:match("/42%.19$") or directory:match("/42%.22$"))
-            if actualVersion ~= "2.10.4" and not reviewed2105 then return false end
+            if actualVersion ~= "2.10.4" and not reviewedBranch then return false end
         elseif actualVersion ~= version then
             return false
         end
@@ -129,9 +130,13 @@ function M.reviewedNativeSearch(pane, refresh)
             or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.2", "codex_inventorytransferperformance.lua")
             or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.3", "codex_inventorytransferperformance.lua")
             or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.4", "codex_inventorytransferperformance.lua")
+            or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.5", "codex_inventorytransferperformance.lua")
+            or reviewedSource(refresh, "Codex_InventoryTransferPerformance_4221", "1.2.6", "codex_inventorytransferperformance.lua")
             or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua")
             or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.2", "suqing_proximityselectionfix.lua")
-            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.3", "suqing_proximityselectionfix.lua"))
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.3", "suqing_proximityselectionfix.lua")
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.4", "suqing_proximityselectionfix.lua")
+            or reviewedSource(refresh, "SuQingUIInteractionFixes", "1.0.5", "suqing_proximityselectionfix.lua"))
 end
 
 local function withCategoryOnly(handler, original, category, ...)

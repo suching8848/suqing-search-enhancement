@@ -379,6 +379,10 @@ local function installRenderer()
         SQ.drawMatches(self, doDragged)
         return result
     end
+    -- Keep CleanUI's overlay registration on the renderer that delegates to it.
+    if original and rawget(ISInventoryPane, "_cleanUIHasBeenReadWrapper") == original then
+        ISInventoryPane._cleanUIHasBeenReadWrapper = ISInventoryPane.renderdetails
+    end
 end
 
 function SQ.tick()

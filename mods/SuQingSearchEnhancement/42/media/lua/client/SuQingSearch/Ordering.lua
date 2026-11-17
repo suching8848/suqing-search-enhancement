@@ -44,7 +44,8 @@ local function reviewedCleanUI(info)
     if not info or not info.getModVersion then return false end
     local version = tostring(info:getModVersion())
     if version == "2.10.4" then return true end
-    if version ~= "2.10.5" or CleanUI_SnakeUtilsRenderCompatInstalled then return false end
+    if (version ~= "2.10.5" and version ~= "2.10.6" and version ~= "2.10.7")
+        or CleanUI_SnakeUtilsRenderCompatInstalled then return false end
     local branch = cleanUIBranch(info)
     return branch == "42.19" or branch == "42.22"
 end
@@ -215,12 +216,18 @@ end
 local stackInputSources = {
     { "CleanUI", "2.10.4", "isui/isinventorypane.lua" },
     { "CleanUI", "2.10.5", "isui/isinventorypane.lua" },
+    { "CleanUI", "2.10.6", "isui/isinventorypane.lua" },
+    { "CleanUI", "2.10.7", "isui/isinventorypane.lua" },
     { "SuQingUIInteractionFixes", "1.0.1", "suqing_proximityselectionfix.lua" },
     { "SuQingUIInteractionFixes", "1.0.2", "suqing_proximityselectionfix.lua" },
     { "SuQingUIInteractionFixes", "1.0.3", "suqing_proximityselectionfix.lua" },
+    { "SuQingUIInteractionFixes", "1.0.4", "suqing_proximityselectionfix.lua" },
+    { "SuQingUIInteractionFixes", "1.0.5", "suqing_proximityselectionfix.lua" },
     { "Codex_InventoryTransferPerformance_4221", "1.2.2", "codex_inventorytransferperformance.lua" },
     { "Codex_InventoryTransferPerformance_4221", "1.2.3", "codex_inventorytransferperformance.lua" },
     { "Codex_InventoryTransferPerformance_4221", "1.2.4", "codex_inventorytransferperformance.lua" },
+    { "Codex_InventoryTransferPerformance_4221", "1.2.5", "codex_inventorytransferperformance.lua" },
+    { "Codex_InventoryTransferPerformance_4221", "1.2.6", "codex_inventorytransferperformance.lua" },
 }
 local observedInputs = {}
 
@@ -292,7 +299,8 @@ end
 
 local function reviewedSelectionBridge(pane)
     local bridge = SuQingUIInteractionFixes and SuQingUIInteractionFixes.proximitySelection
-    return bridge and (bridge.version == "1.0.1" or bridge.version == "1.0.2" or bridge.version == "1.0.3")
+    return bridge and (bridge.version == "1.0.1" or bridge.version == "1.0.2"
+        or bridge.version == "1.0.3" or bridge.version == "1.0.4" or bridge.version == "1.0.5")
         and bridge.installed == true and bridge.enabled == true
         and not pane.doController and pane.inventory and pane.inventory.getType
         and pane.inventory:getType() == "proxInv"

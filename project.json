@@ -2,12 +2,12 @@
   "title_cn": "蘇清的搜索增强",
   "title_en": "SuQing's Search Enhancement",
   "mod_id": "SuQingSearchEnhancement",
-  "version": "0.1.4-rc.3",
+  "version": "0.1.4-rc.5",
   "source": ".",
   "required_mods": [],
   "native_api": "PZAPI/ModOptions",
   "optional_integrations": [
-    "CleanUI 2.10.4/2.10.5",
+    "CleanUI 2.10.4–2.10.7",
     "yxjs_PinYinSearch 1.3",
     "ProximityInventory"
   ],
@@ -26,32 +26,28 @@
     }
   },
   "working_candidate": {
-    "version": "0.1.4-rc.3",
-    "scope": "CleanUI 2.10.5 support on B42.21.0 and B42.22.2",
+    "version": "0.1.4-rc.5",
+    "scope": "CleanUI 2.10.7 support for the reviewed B42.19 and B42.22 inventory renderers",
     "gameplay_acceptance": "pending",
     "offline_checks": {
-      "42.21.0": {
-        "assertions": 1302,
-        "checked_at": "2026-11-12T16:24:41.969618+08:00",
-        "game_jar_sha256": "e1a69eb743ede60b213a0fe7f8b83d4fcab773036d256cc4543a336f3b058a33"
+      "CleanUI B42.19 branch": {
+        "assertions": 1316
       },
-      "42.22.2": {
-        "assertions": 1302,
-        "checked_at": "2026-11-12T16:24:44.904859+08:00",
-        "game_jar_sha256": "3c4a7c5f149d784758c6fb5f8fa85f3a21d572e38bc081400e89035f8120d287"
+      "CleanUI B42.22 branch": {
+        "assertions": 1316
       }
     },
-    "cleanui_workshop_manifest": "5288503784091482270"
+    "cleanui_workshop_manifest": "5894763837795240413"
   },
-  "state": "0.1.4-rc.3 is public and installed in the formal single-player save. In-game verification is pending.",
+  "state": "0.1.4-rc.5 installed in the formal single-player save. In-game search interactions await verification.",
   "workshop": "Existing item 3834692575 updated to 0.1.4-rc.3 and verified public by uncached native readback.",
   "git": "Feature commit 7f523ded93994a980bfce9548f1fe97cd710ef4a pushed to main.",
   "gameplay_acceptance": {
     "status": "pending",
-    "release_version": "0.1.4-rc.3"
+    "release_version": "0.1.4-rc.5"
   },
   "publication_authorized": true,
-  "local_installed_version": "0.1.4-rc.3",
+  "local_installed_version": "0.1.4-rc.5",
   "cover_selection_pending": false,
   "cover_candidates": "art/cover-candidates_20261106/candidate-manifest.json",
   "selected_cover": {
@@ -173,5 +169,23 @@
     "native_verification": "release/0.1.3_20261108/native-verification.json"
   },
   "release_report": "publishing/发布记录_0.1.4-rc.3.md",
-  "native_verification": "publishing/verification-0.1.4-rc.3.json"
+  "native_verification": "publishing/verification-0.1.4-rc.3.json",
+  "previous_working_candidate": {
+    "version": "0.1.4-rc.3",
+    "scope": "CleanUI 2.10.5 support on B42.21.0 and B42.22.2",
+    "gameplay_acceptance": "pending",
+    "offline_checks": {
+      "42.21.0": {
+        "assertions": 1302,
+        "checked_at": "2026-11-12T16:24:41.969618+08:00",
+        "game_jar_sha256": "e1a69eb743ede60b213a0fe7f8b83d4fcab773036d256cc4543a336f3b058a33"
+      },
+      "42.22.2": {
+        "assertions": 1302,
+        "checked_at": "2026-11-12T16:24:44.904859+08:00",
+        "game_jar_sha256": "3c4a7c5f149d784758c6fb5f8fa85f3a21d572e38bc081400e89035f8120d287"
+      }
+    },
+    "cleanui_workshop_manifest": "5288503784091482270"
+  }
 }
